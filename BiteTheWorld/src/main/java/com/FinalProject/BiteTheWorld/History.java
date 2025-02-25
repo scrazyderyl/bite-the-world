@@ -1,4 +1,4 @@
-package main.java.com.FinalProject.BiteTheWorld;
+package com.FinalProject.BiteTheWorld;
 
 import java.util.ArrayList;
 import java.util.Iterator;

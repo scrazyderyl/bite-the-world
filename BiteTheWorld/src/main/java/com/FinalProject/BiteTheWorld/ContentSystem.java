@@ -1,10 +1,9 @@
-package main.java.com.FinalProject.BiteTheWorld;
+package com.FinalProject.BiteTheWorld;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 class ContentSystem {
     // private ArrayList<Recipe> recipes = new ArrayList<>();

@@ -1,8 +1,8 @@
-package main.java.com.FinalProject.BiteTheWorld;
+package com.FinalProject.BiteTheWorld;
 
 class IngredientWithQuantity extends Ingredient {
     protected int id;
-    protected string name;
+    protected String name;
     protected Fraction quantity;
     protected String quantityUnit;
 }
