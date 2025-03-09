@@ -14,8 +14,9 @@ class ContentSystem {
     private List<Report> reports = new ArrayList<>();
     private Map<String, CountryInfo> countries = new HashMap<>();
     private int featuredRecipeID;
-
+    private int currID;
     public void submitRecipe(Recipe recipe) {
+        recipe.setId(currID++);
         recipes.add(recipe);
         updateFeaturedRecipe();
     }
@@ -31,7 +32,14 @@ class ContentSystem {
     public void updateFeaturedRecipe() {
         
     }
-
+    public boolean deleteById(int id){
+        Recipe rem = getRecipeByID(id);
+        if(rem != null){
+            recipes.remove(id);
+            return true;
+        }
+        return false;
+    }
     public CountryInfo getCountryInfo(String country, int limit) {
         throw new UnsupportedOperationException();
     }
