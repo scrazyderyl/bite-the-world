@@ -1,0 +1,23 @@
+{
+  "name": "bite-the-world",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js"
+
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/scrazyderyl/bite-the-world.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/scrazyderyl/bite-the-world/issues"
+  },
+  "homepage": "https://github.com/scrazyderyl/bite-the-world#readme"
+}

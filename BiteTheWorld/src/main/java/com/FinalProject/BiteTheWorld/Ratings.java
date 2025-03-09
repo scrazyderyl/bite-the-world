@@ -12,6 +12,15 @@ class Ratings {
         throw new UnsupportedOperationException();
     }
 
+    public Map<UUID, Integer> getRatings() {
+        return ratings;
+    }
+
+    public void setRatings(Map<UUID, Integer> ratings) {
+        this.ratings = ratings;
+    }
+
     public void setRating(UUID id, int rating) {
+       
     }
 }

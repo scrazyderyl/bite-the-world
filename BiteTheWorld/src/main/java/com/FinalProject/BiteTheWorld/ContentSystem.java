@@ -9,19 +9,27 @@ class ContentSystem {
     // private ArrayList<Recipe> recipes = new ArrayList<>();
     // private ArrayList<Ingredient> ingredients = new ArrayList<>();
     // private ArrayList<Report> reports = new ArrayList<>();
+    private List<Recipe> recipes = new ArrayList<>();
+    private List<Ingredient> ingredients = new ArrayList<>();
+    private List<Report> reports = new ArrayList<>();
     private Map<String, CountryInfo> countries = new HashMap<>();
     private int featuredRecipeID;
 
     public void submitRecipe(Recipe recipe) {
+        recipes.add(recipe);
+        updateFeaturedRecipe();
     }
 
     public void submitReport(Report report) {
+        reports.add(report);
     }
 
     public void addIngredient(Ingredient ingredient) {
+        ingredients.add(ingredient);
     }
 
     public void updateFeaturedRecipe() {
+        
     }
 
     public CountryInfo getCountryInfo(String country, int limit) {
@@ -29,15 +37,30 @@ class ContentSystem {
     }
 
     public Recipe getFeaturedRecipe() {
-        throw new UnsupportedOperationException();
+        for (Recipe r : recipes){
+            if(r.getId() ==featuredRecipeID){
+                return r;
+            }
+           }
+      return null;
     }
 
     public Recipe getRecipeByID(int id) {
-        throw new UnsupportedOperationException();
+        for (Recipe r : recipes){
+            if(r.getId() ==id){
+                return r;
+            }
+           }
+      return null;
     }
 
     public Ingredient getIngredientByID(int id) {
-        throw new UnsupportedOperationException();
+        for (Ingredient i :ingredients){
+            if(i.getId() ==id){
+                return i;
+            }
+           }
+      return null;
     }
 
     public Report getReportByID(Integer id) {

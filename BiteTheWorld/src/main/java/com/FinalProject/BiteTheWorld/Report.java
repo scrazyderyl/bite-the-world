@@ -7,14 +7,20 @@ class Report {
         Open, UnderReview, Closed;
     }
 
-    private int id;
-    private int postId;
-    private int commentId;
-    private String reason;
-    private String description;
+    private final int id;
+    private final int postId;
+    private final int commentId;
+    private final String reason;
+    private final String description;
     protected ReportStatus status;
     protected UUID assignee;
-
+    public Report(final int id, final int postId, final int commentId, final String reason, final String description){
+        this.id = id;
+        this.postId = postId;
+        this.commentId = commentId;
+        this.reason = reason;
+        this.description = description;
+    }
     public int getPostID() {
         throw new UnsupportedOperationException();
     }
@@ -29,5 +35,26 @@ class Report {
 
     public String getDescription() {
         throw new UnsupportedOperationException();
+    }
+    public int getId() {
+        return id;
+    }
+    public int getPostId() {
+        return postId;
+    }
+    public int getCommentId() {
+        return commentId;
+    }
+    public ReportStatus getStatus() {
+        return status;
+    }
+    public void setStatus(ReportStatus status) {
+        this.status = status;
+    }
+    public UUID getAssignee() {
+        return assignee;
+    }
+    public void setAssignee(UUID assignee) {
+        this.assignee = assignee;
     }
 }
