@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.cloud.firestore.Firestore;
+
 class ContentSystem {
     // private ArrayList<Recipe> recipes = new ArrayList<>();
     // private ArrayList<Ingredient> ingredients = new ArrayList<>();
@@ -14,6 +16,10 @@ class ContentSystem {
     private List<Report> reports = new ArrayList<>();
     private Map<String, CountryInfo> countries = new HashMap<>();
     private int featuredRecipeID;
+    private final Firestore db;
+    public ContentSystem(){
+        db = FirebaseConnection.getDatabase();
+    }
     private int currID;
     public void submitRecipe(Recipe recipe) {
         recipe.setId(currID++);
@@ -63,7 +69,7 @@ class ContentSystem {
     }
 
     public Ingredient getIngredientByID(int id) {
-        for (Ingredient i :ingredients){
+        for (Ingredient i : ingredients){
             if(i.getId() ==id){
                 return i;
             }
