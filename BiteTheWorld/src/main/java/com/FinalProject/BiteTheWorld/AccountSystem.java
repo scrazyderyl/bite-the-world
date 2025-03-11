@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 
 class AccountSystem {
@@ -14,10 +16,16 @@ class AccountSystem {
         auth = FirebaseConnection.getAuth();
     }
     //Login with firebase has to be done on the frontend not the backend
-    public UUID login(String email, String password) {
-        
-        throw new UnsupportedOperationException();
+    public String login(String idToken) {
+        try {
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            return decodedToken.getUid(); // Return Firebase user ID if valid
+        } catch (FirebaseAuthException e) {
+            System.err.println("Invalid login token: " + e.getMessage());
+            return null; // Return null if authentication fails
+        }
     }
+    
 
     public boolean register(String name, String email, String password) {
         try {

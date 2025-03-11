@@ -13,6 +13,11 @@ public class RecipeController {
         this.contentSystem = contentSystem;
     }
 
+    @GetMapping("/")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("Welcome to BiteTheWorld API!");
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Recipe> getRecipe(@PathVariable int id) {
         Recipe recipe = contentSystem.getRecipeByID(id);

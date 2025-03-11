@@ -11,7 +11,9 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firestore.v1.WriteResult;
+import org.springframework.stereotype.Service;
 
+@Service
 class ContentSystem {
     // private ArrayList<Recipe> recipes = new ArrayList<>();
     // private ArrayList<Ingredient> ingredients = new ArrayList<>();
