@@ -163,7 +163,24 @@ class ContentSystem {
     }
 
     public Report getReportByID(Integer id) {
-        throw new UnsupportedOperationException();
+        DocumentReference reportRef = db.collection("reports").document(String.valueOf(id));
+        ApiFuture<DocumentSnapshot> future = reportRef.get();
+
+        try {
+            DocumentSnapshot document = future.get();
+            if (document.exists()) {
+                Report report = document.toObject(Report.class);
+                return report;
+            } else {
+                System.out.println("Report with ID " + id + " not found in Firestore.");
+                return null;
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            System.err.println("Error retrieving report: " + e.getMessage());
+            return null;
+        }
+       
     }
 
     public List<Recipe> recommendFromHistory(History history) {
