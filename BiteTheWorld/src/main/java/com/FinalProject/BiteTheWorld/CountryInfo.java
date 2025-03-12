@@ -1,18 +1,11 @@
 package com.FinalProject.BiteTheWorld;
 
 class CountryInfo {
-    protected String summary;
+    public String name;
+    public String summary;
 
-    public CountryInfo(String summary) {
+    public CountryInfo(String name, String summary) {
+        this.name = name;
         this.summary = summary;
     }
-
-    public String getSummary() {
-        return summary;
-    }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-    
 }

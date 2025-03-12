@@ -1,6 +1,5 @@
 package com.FinalProject.BiteTheWorld;
 
-import com.FinalProject.BiteTheWorld.AccountSystem;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -10,14 +9,16 @@ import java.util.Map;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173") // Allow requests from frontend
 public class AuthController {
-
     private final AccountSystem accountSystem;
 
     public AuthController() {
         this.accountSystem = new AccountSystem();
     }
 
-    // ✅ Add the missing login route
+    // This is not correct. The login page takes a username and password for a local
+    // account, or otherwise the user can authenticate through a federated identity
+    // provider. This verifies the user has a valid ID token. For successful local
+    // account logins, this should return a refresh token.
     @PostMapping("/login")
     public Map<String, String> login(@RequestHeader("Authorization") String token) {
         Map<String, String> response = new HashMap<>();
@@ -54,7 +55,7 @@ public class AuthController {
 
     // Request password reset
     @PostMapping("/reset-password")
-    public Map<String, String> resetPassword(@RequestBody Map<String, String> request) {
+    public Map<String, String> requestPasswordReset(@RequestBody Map<String, String> request) {
         String email = request.get("email");
         boolean success = accountSystem.requestPasswordReset(email);
         Map<String, String> response = new HashMap<>();

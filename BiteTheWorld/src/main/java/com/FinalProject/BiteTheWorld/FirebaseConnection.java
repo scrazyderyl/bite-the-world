@@ -1,6 +1,8 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
@@ -26,8 +28,10 @@ public class FirebaseConnection {
 
             auth = FirebaseAuth.getInstance();
             db = FirestoreClient.getFirestore();
+        } catch (IOException e) {
+            System.out.println("Failed to load API config file");
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Failed to connect to Firebase");
         }
     }
 
