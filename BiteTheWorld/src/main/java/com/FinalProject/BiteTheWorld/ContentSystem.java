@@ -42,6 +42,12 @@ class ContentSystem {
         recipeData.put("name", recipe.getName());
         recipeData.put("description", recipe.getDescription());
         recipeData.put("Countries", recipe.getCountries());
+        recipeData.put("imgages",recipe.getImages());
+        recipeData.put("comments",recipe.getComments());
+        recipeData.put("tags",recipe.getTags());
+        recipeData.put("notes",recipe.getNotes());
+        recipeData.put("directions",recipe.getDirections());
+        recipeData.put("rating",recipe.getRating());
         recipeData.put("ingredients", recipe.getIngredients()); // Ensure ingredients are serializable
         recipeData.put("author", recipe.getAuthorId());
         // Firestore reference
@@ -114,7 +120,7 @@ class ContentSystem {
         return null;
 
     }
-
+    //
     public Recipe getFeaturedRecipe() {
         for (Recipe r : recipes) {
             if (r.getId() == featuredRecipeID) {
