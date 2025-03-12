@@ -52,10 +52,10 @@ class ContentSystem {
         ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(ingredient);
 
         try {
-            System.out.println("Report uploaded at: " + result.get().getUpdateTime());
+            System.out.println("Ingredient uploaded at: " + result.get().getUpdateTime());
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
-            System.err.println("Error uploading report: " + e.getMessage());
+            System.err.println("Error uploading ingredient: " + e.getMessage());
         }
     }
 
@@ -70,7 +70,7 @@ class ContentSystem {
     public CountryInfo getCountryInfo(String country, int limit) {
         throw new UnsupportedOperationException();
     }
-
+    
     public Recipe getFeaturedRecipe() {
         return null;
     }
