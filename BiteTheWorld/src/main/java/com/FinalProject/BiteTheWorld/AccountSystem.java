@@ -1,78 +1,67 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
 import com.google.firebase.auth.UserRecord;
 
 class AccountSystem {
-    private List<Account> accounts = new ArrayList<>();
     private FirebaseAuth auth;
-    public AccountSystem(){
+
+    public AccountSystem() {
         auth = FirebaseConnection.getAuth();
     }
-    //Login with firebase has to be done on the frontend not the backend
+
     public String login(String idToken) {
         try {
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+            FirebaseToken decodedToken = auth.verifyIdToken(idToken);
             return decodedToken.getUid(); // Return Firebase user ID if valid
         } catch (FirebaseAuthException e) {
             System.err.println("Invalid login token: " + e.getMessage());
             return null; // Return null if authentication fails
         }
     }
-    
 
     public boolean register(String name, String email, String password) {
         try {
-            UserRecord.CreateRequest request = new UserRecord.CreateRequest().setEmail(email).setPassword(password).setDisplayName(name);
-            UserRecord userRecord = auth.createUser(request);
-            return userRecord != null;
+            UserRecord.CreateRequest request = new UserRecord.CreateRequest().setEmail(email).setPassword(password)
+                    .setDisplayName(name);
+            auth.createUser(request);
         } catch (Exception e) {
             return false;
-            
         }
-       
+
+        return true;
     }
 
     public boolean requestPasswordReset(String email) {
         try {
             auth.generatePasswordResetLink(email);
-            return true;
         } catch (Exception e) {
             return false;
-            // TODO: handle exception
         }
-        
-    }
 
-    
+        return true;
+    }
 
     public boolean changeEmail(String userId, String newEmail) {
         try {
-            UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(userId).setPassword(newEmail);
+            UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(userId).setEmail(newEmail);
             auth.updateUser(request);
-            return true;
         } catch (Exception e) {
             return false;
-            // TODO: handle exception
         }
-        
+
+        return true;
     }
 
     public boolean deleteAccount(String userId) {
         try {
-            
             auth.deleteUser(userId);
-            return true;
         } catch (Exception e) {
             return false;
-            // TODO: handle exception
         }
 
+        return true;
     }
 }

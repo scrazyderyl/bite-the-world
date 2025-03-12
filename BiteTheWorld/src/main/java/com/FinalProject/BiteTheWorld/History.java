@@ -1,16 +1,23 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 class History {
-    private List<Integer> postViews = new ArrayList<>();
+    private List<String> postViews;
 
-    public void addPostID(int id) {
+    public History(List<String> postViews) {
+        this.postViews = postViews;
     }
 
-    public Iterator<Integer> iterator() {
-        throw new UnsupportedOperationException();
+    public void addPostID(String id) {
+
+    }
+
+    public List<String> getPostViews() {
+        return postViews;
+    }
+
+    public void setPostViews(List<String> postViews) {
+        this.postViews = postViews;
     }
 }

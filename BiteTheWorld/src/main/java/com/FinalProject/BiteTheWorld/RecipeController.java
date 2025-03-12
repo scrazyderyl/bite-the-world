@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {
-
     private final ContentSystem contentSystem;
 
     public RecipeController(ContentSystem contentSystem) {
@@ -19,7 +18,7 @@ public class RecipeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getRecipe(@PathVariable int id) {
+    public ResponseEntity<Recipe> getRecipe(@PathVariable String id) {
         Recipe recipe = contentSystem.getRecipeByID(id);
         return recipe != null ? ResponseEntity.ok(recipe) : ResponseEntity.notFound().build();
     }

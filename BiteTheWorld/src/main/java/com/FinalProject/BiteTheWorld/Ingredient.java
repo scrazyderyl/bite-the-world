@@ -1,25 +1,23 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.List;
-
 class Ingredient {
-    private int id;
+    private String id;
     protected String name;
     protected String image;
     protected String description;
 
-    public Ingredient(int id, String name, String image, String description) {
+    public Ingredient(String id, String name, String image, String description) {
         this.id = id;
         this.name = name;
         this.image = image;
         this.description = description;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -45,9 +43,5 @@ class Ingredient {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public List<Recipe> getAssociatedRecipes() {
-        throw new UnsupportedOperationException();
     }
 }
