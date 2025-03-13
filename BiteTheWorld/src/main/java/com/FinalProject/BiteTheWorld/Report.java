@@ -1,60 +1,76 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.UUID;
-
 class Report {
     enum ReportStatus {
         Open, UnderReview, Closed;
     }
 
-    private final int id;
-    private final int postId;
-    private final int commentId;
-    private final String reason;
-    private final String description;
+    enum PostType {
+        Recipe, Ingredient, Comment
+    }
+
+    private String id;
+    private String reporterId;
+    private int postId;
+    private PostType postType;
+    private String reason;
+    private String description;
     protected ReportStatus status;
-    protected UUID assignee;
-    public Report(final int id, final int postId, final int commentId, final String reason, final String description){
+    protected String assigneeId;
+    
+    public Report(String id, String reporterId, int postId, PostType postType, String reason, String description,
+            ReportStatus status, String assigneeId) {
         this.id = id;
+        this.reporterId = reporterId;
         this.postId = postId;
-        this.commentId = commentId;
+        this.postType = postType;
         this.reason = reason;
         this.description = description;
-    }
-    public int getPostID() {
-        throw new UnsupportedOperationException();
-    }
-
-    public int getCommentID() {
-        throw new UnsupportedOperationException();
+        this.status = status;
+        this.assigneeId = assigneeId;
     }
 
-    public String getReason() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getDescription() {
-        throw new UnsupportedOperationException();
-    }
-    public int getId() {
+    public String getId() {
         return id;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getReporterId() {
+        return reporterId;
+    }
+
     public int getPostId() {
         return postId;
     }
-    public int getCommentId() {
-        return commentId;
+
+    public PostType getPostType() {
+        return postType;
     }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
     public ReportStatus getStatus() {
         return status;
     }
+
     public void setStatus(ReportStatus status) {
         this.status = status;
     }
-    public UUID getAssignee() {
-        return assignee;
+
+    public String getAssigneeId() {
+        return assigneeId;
     }
-    public void setAssignee(UUID assignee) {
-        this.assignee = assignee;
+
+    public void setAssigneeId(String assigneeId) {
+        this.assigneeId = assigneeId;
     }
 }

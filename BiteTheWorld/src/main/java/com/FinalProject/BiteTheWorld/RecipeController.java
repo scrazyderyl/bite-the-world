@@ -6,15 +6,19 @@ import org.springframework.http.ResponseEntity;
 @RestController
 @RequestMapping("/recipes")
 public class RecipeController {
-
     private final ContentSystem contentSystem;
 
     public RecipeController(ContentSystem contentSystem) {
         this.contentSystem = contentSystem;
     }
 
+    @GetMapping("/")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("Welcome to BiteTheWorld API!");
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<Recipe> getRecipe(@PathVariable int id) {
+    public ResponseEntity<Recipe> getRecipe(@PathVariable String id) {
         Recipe recipe = contentSystem.getRecipeByID(id);
         return recipe != null ? ResponseEntity.ok(recipe) : ResponseEntity.notFound().build();
     }
