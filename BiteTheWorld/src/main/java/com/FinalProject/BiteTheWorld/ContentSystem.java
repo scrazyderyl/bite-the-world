@@ -22,7 +22,6 @@ class ContentSystem {
 
     public void submitRecipe(Recipe recipe) {
         DocumentReference ref = db.collection("recipes").document();
-        recipe.setId(ref.getId());
         ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(recipe);
 
         try {
@@ -35,7 +34,6 @@ class ContentSystem {
 
     public void submitReport(Report report) {
         DocumentReference ref = db.collection("reports").document();
-        report.setId(ref.getId());
         ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(report);
 
         try {
@@ -48,7 +46,6 @@ class ContentSystem {
 
     public void addIngredient(Ingredient ingredient) {
         DocumentReference ref = db.collection("ingredients").document();
-        ingredient.setId(ref.getId());
         ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(ingredient);
 
         try {

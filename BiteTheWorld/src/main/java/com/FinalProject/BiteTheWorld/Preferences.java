@@ -1,16 +1,11 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.HashMap;
-import java.util.Map;
 
 class Preferences {
-    private Map<String, Object> preferences = new HashMap<>();
+    public HashMap<String, Object> preferences;
 
-    public boolean setPreference(String key, Object value) {
-        throw new UnsupportedOperationException();
-    }
+    public Preferences() {
 
-    public Object getPreference(String key) {
-        throw new UnsupportedOperationException();
     }
 }

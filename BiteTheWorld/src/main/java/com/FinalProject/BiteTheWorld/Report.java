@@ -1,5 +1,7 @@
 package com.FinalProject.BiteTheWorld;
 
+import com.google.cloud.firestore.annotation.DocumentId;
+
 class Report {
     enum ReportStatus {
         Open, UnderReview, Closed;
@@ -9,68 +11,20 @@ class Report {
         Recipe, Ingredient, Comment
     }
 
-    private String id;
-    private String reporterId;
-    private int postId;
-    private PostType postType;
-    private String reason;
-    private String description;
-    protected ReportStatus status;
-    protected String assigneeId;
+    @DocumentId private String id;
+    public String reporterId;
+    public String postId;
+    public PostType postType;
+    public String reason;
+    public String description;
+    public ReportStatus status;
+    public String assigneeId;
     
-    public Report(String id, String reporterId, int postId, PostType postType, String reason, String description,
-            ReportStatus status, String assigneeId) {
-        this.id = id;
-        this.reporterId = reporterId;
-        this.postId = postId;
-        this.postType = postType;
-        this.reason = reason;
-        this.description = description;
-        this.status = status;
-        this.assigneeId = assigneeId;
+    public Report() {
+        
     }
 
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getReporterId() {
-        return reporterId;
-    }
-
-    public int getPostId() {
-        return postId;
-    }
-
-    public PostType getPostType() {
-        return postType;
-    }
-
-    public String getReason() {
-        return reason;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public ReportStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ReportStatus status) {
-        this.status = status;
-    }
-
-    public String getAssigneeId() {
-        return assigneeId;
-    }
-
-    public void setAssigneeId(String assigneeId) {
-        this.assigneeId = assigneeId;
     }
 }
