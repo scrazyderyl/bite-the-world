@@ -1,11 +1,16 @@
 package com.FinalProject.BiteTheWorld;
 
+import com.google.cloud.firestore.annotation.DocumentId;
+
 class CountryInfo {
-    public String name;
+    @DocumentId private String name;
     public String summary;
 
-    public CountryInfo(String name, String summary) {
-        this.name = name;
-        this.summary = summary;
+    public CountryInfo() {
+
+    }
+
+    public String getName() {
+        return name;
     }
 }
