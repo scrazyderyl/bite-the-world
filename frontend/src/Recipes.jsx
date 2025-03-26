@@ -1,5 +1,50 @@
-import React from "react";
+import { React} from "react";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
+import * as Yup from "yup";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+const initialValues = {
+  steps: [
+    {
+      step: "",
+    },
+  ],
+  ingredients: [
+    {
+      ingredient: "",
+      quantity: "",
+      unit: "",
+    },
+  ],
+  name: "" ,
+  prepTime: "",
+  cookTime: "",
+  totalTime: "",
+  servings: "", 
+};
+
+const validationSchema = Yup.object({
+  name: Yup.string().required("Recipe name is required"),
+  prepTime: Yup.string().required("Required"),
+  cookTime: Yup.string().required("Required"),
+  totalTime: Yup.string().required("Required"),
+  servings: Yup.number().positive().integer().required("Required"),
+  ingredients: Yup.array().of(
+    Yup.object({
+      ingredient: Yup.string().required("Ingredient name is required"),
+      quantity: Yup.number()
+        .positive("Must be a positive number")
+        .required("Required"),
+      unit: Yup.string().required("Select a unit"),
+    })
+  ),
+  steps: Yup.array().of(
+    Yup.object({
+      step: Yup.string().required("Step description is required"),
+    })
+  ),
+});
 
 const unitOptions = [
   { value: "g", label: "Grams (g)" },
@@ -22,64 +67,105 @@ const unitOptions = [
   { value: "dash", label: "Dash" },
 ];
 
-const initialValues = {
-  steps: [
-    {
-      step: "",
-    },
-  ],
-  ingredients: [
-    {
-      ingredient: "",
-      quantity: "",
-      unit: "",
-    },
-  ],
-};
 
 const Recipes = () => (
   <div style={styles.formContainer}>
     <h1 style={styles.title}>Add a new recipe</h1>
     <Formik
+      validationSchema={validationSchema}
       initialValues={initialValues}
-      onSubmit={async (values) => {
-        await new Promise((r) => setTimeout(r, 500));
+      onSubmit={async (values , {setSubmitting}) => {
+        console.log("Form values:", values);
+        console.log("submitted");
+        setTimeout(() => {
+          setSubmitting(false);
+        }, 1000);
+      
+        if (Object.keys(values).length === 0) {
+          toast.error("Please fill all required fields!", {
+            position: "top-right",
+            autoClose: 3000,
+          });
+          return;
+        }
+      
+        toast.success("Recipe submitted successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        
         alert(JSON.stringify(values, null, 2));
+        
       }}
     >
-      {({ values }) => (
+      {({ values, handleSubmit }) => (
         <Form>
-          <Field
-            style={styles.recipename}
-            name="name"
-            placeholder="Recipe Name"
-            type="text"
-          />
+          <div className="col" style={styles.col}>
+            <Field
+              style={styles.recipename}
+              name="name"
+              placeholder="Recipe Name"
+              type="text"
+            />
+            <ErrorMessage
+              name={`name`}
+              component="div"
+              className="field-error"
+            />
+          </div>
           <div className="row" style={styles.row}>
-            <Field
-              style={styles.input}
-              name="prepTime"
-              placeholder="Preparation Time"
-              type="text"
-            />
-            <Field
-              style={styles.input}
-              name="cookTime"
-              placeholder="Cook Time"
-              type="text"
-            />
-            <Field
-              style={styles.input}
-              name="totalTime"
-              placeholder="Total Time"
-              type="text"
-            />
-            <Field
-              style={styles.input}
-              name="servings"
-              placeholder="Servings"
-              type="text"
-            />
+            <div className="col" style={styles.col}>
+              <Field
+                style={styles.input}
+                name="prepTime"
+                placeholder="Preparation Time"
+                type="text"
+              />
+              <ErrorMessage
+                name={`prepTime`}
+                component="div"
+                className="field-error"
+              />
+            </div>
+            <div className="col" style={styles.col}>
+              <Field
+                style={styles.input}
+                name="cookTime"
+                placeholder="Cook Time"
+                type="text"
+              />
+              <ErrorMessage
+                name={`cookTime`}
+                component="div"
+                className="field-error"
+              />
+            </div>
+            <div className="col" style={styles.col}>
+              <Field
+                style={styles.input}
+                name="totalTime"
+                placeholder="Total Time"
+                type="text"
+              />
+              <ErrorMessage
+                name={`totalTime`}
+                component="div"
+                className="field-error"
+              />
+            </div>
+            <div className="col" style={styles.col}>
+              <Field
+                style={styles.input}
+                name="servings"
+                placeholder="Servings"
+                type="text"
+              />
+              <ErrorMessage
+                name={`servings`}
+                component="div"
+                className="field-error"
+              />
+            </div>
           </div>
           <FieldArray name="ingredients">
             {({ remove, push }) => (
@@ -90,7 +176,7 @@ const Recipes = () => (
                     <div className="row" key={index} style={styles.row}>
                       <div className="col" style={styles.col}>
                         <label htmlFor={`ingredients.${index}.ingredient`}>
-                          Ingredient
+                          Ingredient {index + 1}
                         </label>
                         <Field
                           style={styles.input}
@@ -115,7 +201,7 @@ const Recipes = () => (
                           type="text"
                         />
                         <ErrorMessage
-                          name={`ingredients.${index}.ingredient`}
+                          name={`ingredients.${index}.quantity`}
                           component="div"
                           className="field-error"
                         />
@@ -129,7 +215,7 @@ const Recipes = () => (
                           style={styles.input}
                           name={`ingredients[${index}].unit`}
                         >
-                          <option value="">cups</option>
+                          <option value="1" disabled> Select a Unit </option>
                           {unitOptions.map((option) => (
                             <option key={option.value} value={option.value}>
                               {option.label}
@@ -169,13 +255,23 @@ const Recipes = () => (
                 <h1 style={styles.subheading}>Add Steps to cook</h1>
                 {values.steps.length > 0 &&
                   values.steps.map((step, index) => (
-                    <div className="stepform" key={index} style={styles.stepform}>
+                    <div
+                      className="stepform"
+                      key={index}
+                      style={styles.stepform}
+                    >
                       <div style={styles.col}>
-                        <label htmlFor={`steps.${index}.step`}>Step</label>
+                        <label
+                          htmlFor={`steps.${index}.step`}
+                          style={styles.stepLabel}
+                        >
+                          Step {index + 1}
+                        </label>
                         <Field
+                          as="textarea"
                           style={styles.stepinfo}
                           name={`steps.${index}.step`}
-                          placeholder="Jane Doe"
+                          placeholder="Describe the step..."
                           type="text"
                         />
                         <ErrorMessage
@@ -184,14 +280,14 @@ const Recipes = () => (
                           className="field-error"
                         />
                       </div>
-                        <button
-                          style={styles.removeButton}
-                          type="button"
-                          className="secondary"
-                          onClick={() => remove(index)}
-                        >
-                          remove step
-                        </button>
+                      <button
+                        style={styles.removeButton}
+                        type="button"
+                        className="secondary"
+                        onClick={() => remove(index)}
+                      >
+                        remove step
+                      </button>
                     </div>
                   ))}
                 <button
@@ -209,6 +305,7 @@ const Recipes = () => (
           <button type="submit" style={styles.submitButton}>
             Submit
           </button>
+
         </Form>
       )}
     </Formik>
@@ -216,6 +313,14 @@ const Recipes = () => (
 );
 
 const styles = {
+  stepLabel: {
+    fontSize: "18px",
+    fontWeight: "bold",
+    color: "#000000",
+    marginBottom: "5px",
+    display: "block", // Ensures it appears above the input field
+  },
+
   formContainer: {
     maxWidth: "900px",
     margin: "auto",
@@ -256,6 +361,7 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     width: "90%",
+    marginBottom: "10px",
   },
 
   row: {
@@ -282,9 +388,9 @@ const styles = {
     outline: "none",
     transition: "border-color 0.2s",
     fontSize: "12pt",
-    height:"200px",
-    width:"80%",
-  }, 
+    height: "200px",
+    width: "80%",
+  },
 
   input: {
     padding: "10px",
