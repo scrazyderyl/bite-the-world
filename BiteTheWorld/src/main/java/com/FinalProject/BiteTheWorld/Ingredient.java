@@ -13,6 +13,13 @@ class Ingredient {
 
     }
 
+    public Ingredient(String name, String authorID, String image, String description) {
+        this.name = name;
+        this.authorID = authorID;
+        this.image = image;
+        this.description = description;
+    }
+
     public String getId() {
         return id;
     }
