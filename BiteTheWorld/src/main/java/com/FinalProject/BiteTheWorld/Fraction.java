@@ -1,7 +1,12 @@
 package com.FinalProject.BiteTheWorld;
 
+import jakarta.validation.constraints.Positive;
+
 class Fraction {
+    @Positive
     public int numerator;
+
+    @Positive
     public int denominator;
 
     public Fraction() {

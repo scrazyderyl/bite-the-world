@@ -15,31 +15,6 @@ public class AuthController {
         this.accountSystem = new AccountSystem();
     }
 
-    // This is not correct. The login page takes a username and password for a local
-    // account, or otherwise the user can authenticate through a federated identity
-    // provider. This verifies the user has a valid ID token. For successful local
-    // account logins, this should return a refresh token.
-    @PostMapping("/login")
-    public Map<String, String> login(@RequestHeader("Authorization") String token) {
-        Map<String, String> response = new HashMap<>();
-
-        // Remove "Bearer " prefix from token
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        String userId = accountSystem.login(token);
-        if (userId != null) {
-            response.put("status", "success");
-            response.put("userId", userId);
-        } else {
-            response.put("status", "error");
-            response.put("message", "Invalid token");
-        }
-
-        return response;
-    }
-
     // Register a new user
     @PostMapping("/register")
     public Map<String, String> register(@RequestBody Map<String, String> request) {
