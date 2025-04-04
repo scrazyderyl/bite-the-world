@@ -8,38 +8,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/recipes")
-public class RecipeController {
+@RequestMapping("/ingredients")
+public class IngredientController {
     private final ContentSystem contentSystem;
 
-    public RecipeController() {
+    public IngredientController() {
         this.contentSystem = ContentSystem.getInstance();
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<String> get(@PathVariable String id, @RequestBody IdToken idToken) {
+    public ResponseEntity<Ingredient> get(@PathVariable String id) {
         try {
-            Recipe recipe = contentSystem.getDocument("recipes", id).toObject(Recipe.class);
+            Ingredient ingredient = contentSystem.getDocument("ingredients", id).toObject(Ingredient.class);
             
-            if (recipe == null) {
+            if (ingredient == null) {
                 return ResponseEntity.notFound().build();
             }
 
-            // Pass UID as context to serializer for ratings
-            String userId = idToken.idToken == null ? null : FirebaseConnection.getUID(idToken.idToken);
-            ObjectMapper mapper = new ObjectMapper();
-            ObjectWriter writer = mapper.writer().withAttribute("uid", userId);
-
-            String serializedRecipe = writer.writeValueAsString(recipe);
-
-            return ResponseEntity.ok(serializedRecipe);
+            return ResponseEntity.ok(ingredient);
         }  catch (Exception e) {
             System.out.println("Erorr: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
@@ -47,10 +38,10 @@ public class RecipeController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<String> submit(@RequestBody @Valid RecipeSubmission submission) {
+    public ResponseEntity<String> submit(@RequestBody @Valid IngredientSubmission submission) {
         try {
-            Recipe recipe = submission.toRecipe();
-            String id = contentSystem.submit("recipes", recipe);
+            Ingredient ingredient = submission.toIngredient();
+            String id = contentSystem.submit("ingredients", ingredient);
 
             if (id == null) {
                 return ResponseEntity.internalServerError().build();
@@ -64,7 +55,7 @@ public class RecipeController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id) {
-        boolean deleted = contentSystem.deleteById("recipes", id);
+        boolean deleted = contentSystem.deleteById("ingredients", id);
         return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
     }
 }

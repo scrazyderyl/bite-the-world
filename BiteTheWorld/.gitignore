@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 /src/main/resources/api_key.json
+/src/main/resources/gemini_api_key.txt
 
 ### STS ###
 .apt_generated

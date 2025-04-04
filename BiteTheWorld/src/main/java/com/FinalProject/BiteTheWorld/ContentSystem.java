@@ -4,132 +4,89 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import org.springframework.stereotype.Service;
+
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import org.springframework.stereotype.Service;
+import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.WriteResult;
 
 @Service
 class ContentSystem {
+    private static ContentSystem instance;
+
     private final Firestore db;
-    private HashMap<String, CountryInfo> countries;
+    private HashMap<String, CountryInfo> countries = new HashMap<>() {{
+        put("USA", new CountryInfo() {{
+            name = "United States of America";
+            summary = "The USA is known for its diverse cuisine, influenced by various cultures and regions. From burgers and hot dogs to barbecue and soul food, American cuisine offers a wide range of flavors and dishes.";
+        }});
+    }};
     private Recipe featuredRecipe;
 
-    public ContentSystem() {
+    static {
+        instance = new ContentSystem();
+    }
+    
+    private ContentSystem() {
         db = FirebaseConnection.getDatabase();
     }
 
-    public void submitRecipe(Recipe recipe) {
-        DocumentReference ref = db.collection("recipes").document();
-        ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(recipe);
+    public static ContentSystem getInstance() {
+        return instance;
+    }
+
+    public <T> String submit(String collection, T document) {
+        DocumentReference ref = db.collection(collection).document();
+        ApiFuture<WriteResult> result = ref.set(document);
 
         try {
-            System.out.println("Recipe uploaded at: " + result.get().getUpdateTime());
+            result.get();
+            return ref.getId();
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error uploading recipe: " + e.getMessage());
+            return null;
         }
     }
 
-    public void submitReport(Report report) {
-        DocumentReference ref = db.collection("reports").document();
-        ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(report);
+    public DocumentSnapshot getDocument(String collection, String id) throws InterruptedException, ExecutionException {
+        ApiFuture<DocumentSnapshot> request = db.collection(collection).document(id).get();
+
+        return request.get();
+    }
+
+    public boolean deleteById(String collection, String id) {
+        ApiFuture<WriteResult> result = db.collection(collection).document(id).delete();
 
         try {
-            System.out.println("Report uploaded at: " + result.get().getUpdateTime());
+            result.get();
+            return true;
         } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error uploading report: " + e.getMessage());
+            return false;
+        }        
+    }
+
+    public List<Recipe> getRecipesByCountry(String country) {
+        ApiFuture<QuerySnapshot> request = db.collection("recipes").whereArrayContains("countries", country).get();
+        
+        try {
+            return request.get().toObjects(Recipe.class);
+        } catch (InterruptedException | ExecutionException e) {
+            return null;
         }
     }
 
-    public void addIngredient(Ingredient ingredient) {
-        DocumentReference ref = db.collection("ingredients").document();
-        ApiFuture<com.google.cloud.firestore.WriteResult> result = ref.set(ingredient);
-
-        try {
-            System.out.println("Ingredient uploaded at: " + result.get().getUpdateTime());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error uploading ingredient: " + e.getMessage());
-        }
+    public CountryInfo getCountryInfo(String country) {
+        return countries.get(country);
     }
 
     public void updateFeaturedRecipe() {
         throw new UnsupportedOperationException();
     }
-
-    public boolean deleteById(int id) {
-        throw new UnsupportedOperationException();
-    }
-
-    public CountryInfo getCountryInfo(String country, int limit) {
-        throw new UnsupportedOperationException();
-    }
     
     public Recipe getFeaturedRecipe() {
-        return null;
-    }
-
-    public Recipe getRecipeByID(String id) {
-        ApiFuture<DocumentSnapshot> request = db.collection("recipes").document(id).get();
-
-        try {
-            DocumentSnapshot document = request.get();
-
-            if (document.exists()) {
-                Recipe recipe = document.toObject(Recipe.class);
-                return recipe;
-            } else {
-                System.out.println("Recipe with ID " + id + " not found in Firestore.");
-                return null;
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error retrieving recipe: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public Ingredient getIngredientByID(String id) {
-        ApiFuture<DocumentSnapshot> request = db.collection("ingredients").document(id).get();
-
-        try {
-            DocumentSnapshot document = request.get();
-
-            if (document.exists()) {
-                Ingredient ingredient = document.toObject(Ingredient.class);
-                return ingredient;
-            } else {
-                System.out.println("Recipe with ID " + id + " not found in Firestore.");
-                return null;
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error retrieving recipe: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public Report getReportByID(String id) {
-        ApiFuture<DocumentSnapshot> request = db.collection("reports").document(id).get();
-
-        try {
-            DocumentSnapshot document = request.get();
-
-            if (document.exists()) {
-                Report report = document.toObject(Report.class);
-                return report;
-            } else {
-                System.out.println("Report with ID " + id + " not found in Firestore.");
-                return null;
-            }
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            System.err.println("Error retrieving report: " + e.getMessage());
-            return null;
-        }
+        return featuredRecipe;
     }
 
     public List<Recipe> recommendFromHistory(History history) {
