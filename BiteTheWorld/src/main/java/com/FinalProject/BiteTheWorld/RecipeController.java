@@ -18,9 +18,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/recipes")
 public class RecipeController {
     private final ContentSystem contentSystem;
+    private final AccountSystem accountSystem;
 
     public RecipeController() {
         this.contentSystem = ContentSystem.getInstance();
+        this.accountSystem = AccountSystem.getInstance();
     }
 
     @PostMapping("/{id}")
@@ -32,10 +34,17 @@ public class RecipeController {
                 return ResponseEntity.notFound().build();
             }
 
-            // Pass UID as context to serializer for ratings
-            String userId = idToken.idToken == null ? null : FirebaseConnection.getUID(idToken.idToken);
             ObjectMapper mapper = new ObjectMapper();
-            ObjectWriter writer = mapper.writer().withAttribute("uid", userId);
+            ObjectWriter writer;
+            
+            // If user is not logged in
+            if (idToken.idToken == null) {
+                writer = mapper.writer().withAttribute("uid", null);
+            } else {
+                String userId = accountSystem.getUID(idToken.idToken);
+                writer = mapper.writer().withAttribute("uid", userId); // Pass uid to serializer for user ratings
+                accountSystem.addToHistory(userId, id); // Add to history
+            }
 
             String serializedRecipe = writer.writeValueAsString(recipe);
 
