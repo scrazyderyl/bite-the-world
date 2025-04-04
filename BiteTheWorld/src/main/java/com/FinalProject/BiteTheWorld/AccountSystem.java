@@ -1,33 +1,55 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
 
 class AccountSystem {
-    private List<Account> accounts = new ArrayList<>();
+    private FirebaseAuth auth;
 
-    public UUID login(String email, String password) {
-        throw new UnsupportedOperationException();
+    public AccountSystem() {
+        auth = FirebaseConnection.getAuth();
     }
 
     public boolean register(String name, String email, String password) {
-        throw new UnsupportedOperationException();
+        try {
+            UserRecord.CreateRequest request = new UserRecord.CreateRequest().setEmail(email).setPassword(password)
+                    .setDisplayName(name);
+            auth.createUser(request);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean requestPasswordReset(String email) {
-        throw new UnsupportedOperationException();
+        try {
+            auth.generatePasswordResetLink(email);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
-    public boolean resetPassword(UUID userId, String newPassword) {
-        throw new UnsupportedOperationException();
+    public boolean changeEmail(String userId, String newEmail) {
+        try {
+            UserRecord.UpdateRequest request = new UserRecord.UpdateRequest(userId).setEmail(newEmail);
+            auth.updateUser(request);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
     }
 
-    public boolean changeEmail(UUID userId, String newEmail) {
-        throw new UnsupportedOperationException();
-    }
+    public boolean deleteAccount(String userId) {
+        try {
+            auth.deleteUser(userId);
+        } catch (Exception e) {
+            return false;
+        }
 
-    public boolean deleteAccount(UUID userId) {
-        throw new UnsupportedOperationException();
+        return true;
     }
 }

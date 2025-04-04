@@ -1,53 +1,26 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.List;
+import com.google.cloud.firestore.annotation.DocumentId;
 
 class Ingredient {
-    private int id;
-    protected String name;
-    protected String image;
-    protected String description;
+    @DocumentId private String id;
+    public String name;
+    public String authorID;
+    public String image;
+    public String description;
 
-    public Ingredient(int id, String name, String image, String description) {
-        this.id = id;
+    public Ingredient() {
+
+    }
+
+    public Ingredient(String name, String authorID, String image, String description) {
         this.name = name;
+        this.authorID = authorID;
         this.image = image;
         this.description = description;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public List<Recipe> getAssociatedRecipes() {
-        throw new UnsupportedOperationException();
     }
 }

@@ -1,26 +1,39 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 class Ratings {
-    protected Map<UUID, Integer> ratings = new HashMap<>();
-    protected int sum;
+    public HashMap<String, Integer> ratings;
+    public int sum;
 
-    public float average() {
-        throw new UnsupportedOperationException();
+    public Ratings() {
+        this.ratings = new HashMap<>();
     }
 
-    public Map<UUID, Integer> getRatings() {
-        return ratings;
+    public double average() {
+        if (ratings.isEmpty()) {
+            return 0;
+        }
+        
+        return (double) sum / ratings.size();
     }
 
-    public void setRatings(Map<UUID, Integer> ratings) {
-        this.ratings = ratings;
+    public int count() {
+        return ratings.size();
     }
 
-    public void setRating(UUID id, int rating) {
-       
+    public void setRating(String userId, int rating) {
+        Integer previous = ratings.put(userId, rating);
+
+        // Remove previous rating first if it exists
+        if (previous != null) {
+            sum -= previous;
+        }
+
+        sum += rating;
+    }
+
+    public Integer getUserRating(String userId) {
+        return ratings.get(userId);
     }
 }

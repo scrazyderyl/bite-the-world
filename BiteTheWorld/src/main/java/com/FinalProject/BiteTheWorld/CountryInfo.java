@@ -1,18 +1,13 @@
 package com.FinalProject.BiteTheWorld;
 
+import com.google.cloud.firestore.annotation.DocumentId;
+
 class CountryInfo {
-    protected String summary;
+    @DocumentId private String id;
+    public String name;
+    public String summary;
 
-    public CountryInfo(String summary) {
-        this.summary = summary;
-    }
+    public CountryInfo() {
 
-    public String getSummary() {
-        return summary;
     }
-
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
-    
 }

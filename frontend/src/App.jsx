@@ -3,26 +3,48 @@ import mapboxgl from 'mapbox-gl';
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
+import RecipeSubmit from './RecipeSubmit';
+import Recipes from './Recipes';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
 
 function App() {
+  const [countryname, setCountryname] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
   const [user, setUser] = useState(null); 
   const [showSignup, setShowSignup] = useState(false); 
   const [currentPage, setCurrentPage] = useState('map'); // current state
 
+  async function fetchCountry(lng, lat) {
+    try {
+      const response = await fetch(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}&access_token=${mapboxgl.accessToken}`);
+      const data = await response.json();
+      return data; // Return data for use outside the function
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
   useEffect(() => {
     if (currentPage === 'map') {
       mapboxgl.accessToken = 'pk.eyJ1Ijoia2VuYmFycmV0dCIsImEiOiJjbTdwNnNjZ3EwazkzMmtwdTUyd245OWZzIn0.kpXLmwdN386GWurljXEuaw';
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-74.5, 40],
-        zoom: 1,
+        style: 'mapbox://styles/kenbarrett/cm84ln2qt005l01qid128djhw',
+        center: [5, 10],
+        zoom: 1.5
       });
+      
+    mapRef.current.on('click', async (event) => {
+      const { lng, lat } = event.lngLat; // Get clicked coordinates
+      console.log(`Clicked at Longitude: ${lng}, Latitude: ${lat}`);
+      let countrydata = await fetchCountry(lng, lat);
+      setCountryname(countrydata.features[0].properties.context.country.name);
+      console.log(countryname);
+      
+    });
   
       return () => {
         if (mapRef.current) {
@@ -65,9 +87,9 @@ function App() {
             </button>
           </li>
           <li style={styles.li}>
-            <button onClick={() => setCurrentPage('recipes')} style={styles.link}>
-              Recipes
-            </button>
+            { countryname ? <button onClick={() => setCurrentPage('recipes')} style={styles.link}>
+              Recipes for {countryname}
+            </button> : null}
           </li>
           {user && (
             <li style={styles.li}>
@@ -99,9 +121,11 @@ function App() {
       )}
 
       {currentPage === 'recipes' && (
-        <div style={styles.pageContainer}>
+        <div>
           <h2>Recipes</h2>
           <p>Your saved recipes will appear here.</p>
+          <RecipeSubmit/>
+          <Recipes/>
         </div>
       )}
     </>

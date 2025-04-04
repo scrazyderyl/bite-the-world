@@ -1,26 +1,25 @@
 package com.FinalProject.BiteTheWorld;
 
-class IngredientWithQuantity extends Ingredient {
-    protected int id;
-    protected String name;
-    protected Fraction quantity;
-    protected String quantityUnit;
-    public IngredientWithQuantity(int id, String name, Fraction quantity, String description,String quantityUnit) {
-        super(id, name, name, description);
-        this.quantity = quantity;
-       this.quantityUnit = quantityUnit;
-    }
-    public Fraction getQuantity() {
-        return quantity;
-    }
-    public void setQuantity(Fraction quantity) {
-        this.quantity = quantity;
-    }
-    public String getQuantityUnit() {
-        return quantityUnit;
-    }
-    public void setQuantityUnit(String quantityUnit) {
-        this.quantityUnit = quantityUnit;
-    }
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
+class IngredientWithQuantity {
+    @NotNull
+    public int id;
+
+    @NotNull
+    @NotBlank
+    public String name;
+
+    @NotNull
+    public Fraction quantity;
+
+    @NotNull
+    @Size(min = 1)
+    public String quantityUnit;
+
+    public IngredientWithQuantity() {
+        
+    }
 }

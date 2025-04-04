@@ -1,60 +1,39 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.UUID;
+import com.google.cloud.firestore.annotation.DocumentId;
 
 class Report {
     enum ReportStatus {
         Open, UnderReview, Closed;
     }
 
-    private final int id;
-    private final int postId;
-    private final int commentId;
-    private final String reason;
-    private final String description;
-    protected ReportStatus status;
-    protected UUID assignee;
-    public Report(final int id, final int postId, final int commentId, final String reason, final String description){
-        this.id = id;
+    enum PostType {
+        Recipe, Ingredient, Comment
+    }
+
+    @DocumentId private String id;
+    public String reporterId;
+    public String postId;
+    public PostType postType;
+    public String reason;
+    public String description;
+    public ReportStatus status;
+    public String assigneeId;
+    
+    public Report() {
+        
+    }
+
+    public Report(String reporterId, String postId, PostType postType, String reason, String description) {
+        this.reporterId = reporterId;
         this.postId = postId;
-        this.commentId = commentId;
+        this.postType = postType;
         this.reason = reason;
         this.description = description;
-    }
-    public int getPostID() {
-        throw new UnsupportedOperationException();
+        this.status = ReportStatus.Open;
     }
 
-    public int getCommentID() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getReason() {
-        throw new UnsupportedOperationException();
-    }
-
-    public String getDescription() {
-        throw new UnsupportedOperationException();
-    }
-    public int getId() {
+    public String getId() {
         return id;
-    }
-    public int getPostId() {
-        return postId;
-    }
-    public int getCommentId() {
-        return commentId;
-    }
-    public ReportStatus getStatus() {
-        return status;
-    }
-    public void setStatus(ReportStatus status) {
-        this.status = status;
-    }
-    public UUID getAssignee() {
-        return assignee;
-    }
-    public void setAssignee(UUID assignee) {
-        this.assignee = assignee;
     }
 }

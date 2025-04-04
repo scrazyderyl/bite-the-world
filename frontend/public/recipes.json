@@ -1,0 +1,57 @@
+[
+    {
+      "id": 1,
+      "name": "Pancakes",
+      "description": "Fluffy and golden breakfast classic.",
+      "cookingTime": 20,
+      "servings": 4,
+      "ingredients": [
+        { "name": "Flour", "quantity": 2, "unit": "cups" },
+        { "name": "Eggs", "quantity": 2, "unit": "pieces" },
+        { "name": "Milk", "quantity": 1.5, "unit": "cups" },
+        { "name": "Baking Powder", "quantity": 2, "unit": "tsp" }
+      ],
+      "steps": [
+        "In a bowl, mix flour, baking powder, and salt.",
+        "In another bowl, whisk eggs and milk together.",
+        "Combine wet and dry ingredients until just mixed.",
+        "Heat a skillet over medium heat and pour batter to form pancakes.",
+        "Cook until bubbles form, then flip and cook until golden."
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Scrambled Eggs",
+      "description": "Quick and easy scrambled eggs.",
+      "cookingTime": 10,
+      "servings": 2,
+      "ingredients": [
+        { "name": "Eggs", "quantity": 3, "unit": "pieces" },
+        { "name": "Butter", "quantity": 1, "unit": "tbsp" },
+        { "name": "Salt", "quantity": 0.5, "unit": "tsp" }
+      ],
+      "steps": [
+        "Crack eggs into a bowl and whisk with salt.",
+        "Melt butter in a skillet over medium heat.",
+        "Pour in the eggs and stir gently until cooked to your liking."
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Avocado Toast",
+      "description": "Simple and delicious avocado toast.",
+      "cookingTime": 10,
+      "servings": 1,
+      "ingredients": [
+        { "name": "Bread", "quantity": 2, "unit": "slices" },
+        { "name": "Avocado", "quantity": 1, "unit": "whole" },
+        { "name": "Lemon Juice", "quantity": 1, "unit": "tsp" },
+        { "name": "Salt", "quantity": 1, "unit": "pinch" }
+      ],"steps": [
+        "Toast the bread slices until golden.",
+        "Mash the avocado with lemon juice and salt.",
+        "Spread the avocado mixture on the toasted bread."
+      ]
+    }
+  ]
+  
