@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
+import RecipeSubmit from './RecipeSubmit';
 import Recipes from './Recipes';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -123,6 +124,7 @@ function App() {
         <div>
           <h2>Recipes</h2>
           <p>Your saved recipes will appear here.</p>
+          <RecipeSubmit/>
           <Recipes/>
         </div>
       )}
