@@ -19,6 +19,10 @@ class Account {
 
     }
 
+    public Account(AccountType type) {
+        this.type = type;
+    }
+
     public String getId() {
         return id;
     }

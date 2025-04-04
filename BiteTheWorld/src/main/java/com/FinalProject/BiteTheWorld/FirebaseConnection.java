@@ -8,7 +8,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.cloud.FirestoreClient;
 
 public class FirebaseConnection {
@@ -42,9 +41,5 @@ public class FirebaseConnection {
 
     public static FirebaseAuth getAuth() {
         return auth;
-    }
-
-    public static String getUID(String idToken) throws FirebaseAuthException {
-        return auth.verifyIdToken(idToken).getUid();
     }
 }

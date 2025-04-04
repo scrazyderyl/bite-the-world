@@ -30,14 +30,14 @@ class ContentSystem {
         countries = new HashMap<>();
 
         // Get country info
-        try {
-            ApiFuture<QuerySnapshot> request = instance.db.collection("countries").get();
-            List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
+        // try {
+        //     ApiFuture<QuerySnapshot> request = instance.db.collection("countries").get();
+        //     List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
 
-            for (CountryInfo country : countryList) {
-                countries.put(country.name, country);
-            }
-        } catch (Exception e) {
+        //     for (CountryInfo country : countryList) {
+        //         countries.put(country.name, country);
+        //     }
+        // } catch (Exception e) {
             for (Country country : Country.values()) {
                 CountryInfo countryInfo = new CountryInfo() {{
                     name = country.name;
@@ -46,7 +46,7 @@ class ContentSystem {
 
                 countries.put(country.name(), countryInfo);
             }
-        }
+        // }
     }
 
     public static ContentSystem getInstance() {
