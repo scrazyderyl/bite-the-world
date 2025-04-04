@@ -18,12 +18,7 @@ class ContentSystem {
     private static ContentSystem instance;
 
     private final Firestore db;
-    private HashMap<String, CountryInfo> countries = new HashMap<>() {{
-        put("USA", new CountryInfo() {{
-            name = "United States of America";
-            summary = "The USA is known for its diverse cuisine, influenced by various cultures and regions. From burgers and hot dogs to barbecue and soul food, American cuisine offers a wide range of flavors and dishes.";
-        }});
-    }};
+    private HashMap<String, CountryInfo> countries;
     private Recipe featuredRecipe;
 
     static {
@@ -32,6 +27,26 @@ class ContentSystem {
     
     private ContentSystem() {
         db = FirebaseConnection.getDatabase();
+        countries = new HashMap<>();
+
+        // Get country info
+        try {
+            ApiFuture<QuerySnapshot> request = instance.db.collection("countries").get();
+            List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
+
+            for (CountryInfo country : countryList) {
+                countries.put(country.name, country);
+            }
+        } catch (Exception e) {
+            for (Country country : Country.values()) {
+                CountryInfo countryInfo = new CountryInfo() {{
+                    name = country.name;
+                    summary = "Summary not available";
+                }};
+
+                countries.put(country.name(), countryInfo);
+            }
+        }
     }
 
     public static ContentSystem getInstance() {
