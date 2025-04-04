@@ -3,7 +3,6 @@ package com.FinalProject.BiteTheWorld;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 class IngredientSubmission {
     public String idToken;
@@ -21,7 +20,7 @@ class IngredientSubmission {
     }
 
     public Ingredient toIngredient() throws FirebaseAuthException {
-        String authorId = FirebaseConnection.getUID(idToken);
+        String authorId = AccountSystem.getInstance().getUID(idToken);
         
         return new Ingredient(name, authorId, image, description);
     }

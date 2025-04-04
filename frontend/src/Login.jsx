@@ -11,22 +11,7 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      const token = await user.getIdToken(); // Get Firebase ID token
-
-      // Send token to backend for verification
-      const response = await fetch("http://localhost:8080/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) throw new Error("Login failed!");
-
-      const data = await response.json();
-      onLogin(data.userId); // Pass userId to parent
+      onLogin();
     } catch (error) {
       setError(error.message);
     }

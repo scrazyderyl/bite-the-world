@@ -48,7 +48,7 @@ class RecipeSubmission {
     }
 
     public Recipe toRecipe() throws FirebaseAuthException {
-        String authorId = FirebaseConnection.getUID(idToken);
+        String authorId = AccountSystem.getInstance().getUID(idToken);
 
         return new Recipe(name, authorId, tags, countries, description, images, prepTime, cookTime, servings, ingredients,
                 directions, notes);
