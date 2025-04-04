@@ -25,7 +25,7 @@ class ReportSubmission {
     }
 
     public Report toReport() throws FirebaseAuthException {
-        String reporterId = FirebaseConnection.getUID(idToken);
+        String reporterId = AccountSystem.getInstance().getUID(idToken);
         
         return new Report(reporterId, postId, postType, reason, description);
     }

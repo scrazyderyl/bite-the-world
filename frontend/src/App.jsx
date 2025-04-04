@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { auth } from "./firebaseConfig";
+
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
@@ -13,7 +15,7 @@ function App() {
   const [countryname, setCountryname] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState();
   const [showSignup, setShowSignup] = useState(false); 
   const [currentPage, setCurrentPage] = useState('map'); // current state
 
@@ -28,6 +30,8 @@ function App() {
   }
 
   useEffect(() => {
+    setUser(auth.currentUser);
+
     if (currentPage === 'map') {
       mapboxgl.accessToken = 'pk.eyJ1Ijoia2VuYmFycmV0dCIsImEiOiJjbTdwNnNjZ3EwazkzMmtwdTUyd245OWZzIn0.kpXLmwdN386GWurljXEuaw';
       mapRef.current = new mapboxgl.Map({
@@ -55,21 +59,21 @@ function App() {
   }, [currentPage]); // make sure page changes on return to Map
 
   // user login/signin
-  const handleLogin = (username, password) => {
-    // REPLACE WITH FIREBASE AUTHENTICATION LOGIN
-    console.log('Logging in with:', username, password);
-    setUser({ username }); //fake simulation
+  const handleLogin = () => {
+    setUser(auth.currentUser);
   };
 
-  const handleSignup = (username, password) => {
-    // REPLACE WITH FIREBASE AUTHENTICATION LOGIN
-    console.log('Signing up with:', username, password);
-    setUser({ username }); //fake simulation
+  const handleSignup = () => {
+    setUser(auth.currentUser);
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setCurrentPage('map'); // go to map page
+    auth.signOut().then(() => {
+      setUser(null);
+      setCurrentPage('map'); // go to map page
+    }).catch((error) => {
+      console.log("Failde to sign out", error);
+    });
   };
 
   return (
@@ -108,7 +112,7 @@ function App() {
       {currentPage === 'user' && (
         <div style={styles.pageContainer}>
           {user ? (
-            <UserHomepage username={user.username} recipes={[]} />
+            <UserHomepage username={user.displayName} recipes={[]} />
           ) : showSignup ? (
             <Signup onSignup={handleSignup} />
           ) : (
