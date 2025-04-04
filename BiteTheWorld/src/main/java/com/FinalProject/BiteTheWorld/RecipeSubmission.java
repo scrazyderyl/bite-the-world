@@ -11,7 +11,6 @@ import jakarta.validation.constraints.Size;
 import java.util.List;
 
 class RecipeSubmission {
-    @NotNull
     public String idToken;
 
     @NotBlank

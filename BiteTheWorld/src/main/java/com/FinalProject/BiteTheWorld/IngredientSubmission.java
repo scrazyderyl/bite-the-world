@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 class IngredientSubmission {
-    @NotNull
     public String idToken;
 
     @NotBlank
