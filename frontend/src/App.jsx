@@ -12,12 +12,13 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
 
 function App() {
+  const [loaded, setLoaded] = useState(false);
   const [countryname, setCountryname] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
   const [user, setUser] = useState();
   const [showSignup, setShowSignup] = useState(false); 
-  const [currentPage, setCurrentPage] = useState('map'); // current state
+  const [currentPage, setCurrentPage] = useState('none'); // current state
 
   async function fetchCountry(lng, lat) {
     try {
@@ -29,9 +30,15 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    setUser(auth.currentUser);
+  if (!loaded) {
+    auth.authStateReady().then(() => {
+      setUser(auth.currentUser);
+      setLoaded(true);
+      setCurrentPage('map');
+    });
+  }
 
+  useEffect(() => {
     if (currentPage === 'map') {
       mapboxgl.accessToken = 'pk.eyJ1Ijoia2VuYmFycmV0dCIsImEiOiJjbTdwNnNjZ3EwazkzMmtwdTUyd245OWZzIn0.kpXLmwdN386GWurljXEuaw';
       mapRef.current = new mapboxgl.Map({
@@ -77,8 +84,8 @@ function App() {
   };
 
   return (
-    <>
-      <nav style={styles.nav}>
+    <div style={styles.page}>
+      <nav style={{ ...styles.nav, display: loaded ? 'block' : 'none' }}>
         <ul style={styles.ul}>
           <li style={styles.li}>
             <button onClick={() => setCurrentPage('map')} style={styles.link}>
@@ -132,11 +139,17 @@ function App() {
           <Recipes/>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
 const styles = {
+  page: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    width: '100vw',
+  },
   nav: {
     backgroundColor: '#333',
     padding: '10px',
@@ -165,9 +178,9 @@ const styles = {
     cursor: 'pointer',
   },
   mapContainer: {
-    height: '100vh',
+    height: '100%',
     width: '100%',
-    marginTop: '60px',
+    marginTop: '65.59px',
   },
   pageContainer: {
     marginTop: '60px',
