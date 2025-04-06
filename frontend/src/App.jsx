@@ -1,5 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import { auth } from "./firebaseConfig";
+
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
@@ -10,12 +12,13 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
 
 function App() {
+  const [loaded, setLoaded] = useState(false);
   const [countryname, setCountryname] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState();
   const [showSignup, setShowSignup] = useState(false); 
-  const [currentPage, setCurrentPage] = useState('map'); // current state
+  const [currentPage, setCurrentPage] = useState('none'); // current state
 
   async function fetchCountry(lng, lat) {
     try {
@@ -25,6 +28,14 @@ function App() {
     } catch (error) {
       console.error('Error:', error);
     }
+  }
+
+  if (!loaded) {
+    auth.authStateReady().then(() => {
+      setUser(auth.currentUser);
+      setLoaded(true);
+      setCurrentPage('map');
+    });
   }
 
   useEffect(() => {
@@ -55,26 +66,26 @@ function App() {
   }, [currentPage]); // make sure page changes on return to Map
 
   // user login/signin
-  const handleLogin = (username, password) => {
-    // REPLACE WITH FIREBASE AUTHENTICATION LOGIN
-    console.log('Logging in with:', username, password);
-    setUser({ username }); //fake simulation
+  const handleLogin = () => {
+    setUser(auth.currentUser);
   };
 
-  const handleSignup = (username, password) => {
-    // REPLACE WITH FIREBASE AUTHENTICATION LOGIN
-    console.log('Signing up with:', username, password);
-    setUser({ username }); //fake simulation
+  const handleSignup = () => {
+    setUser(auth.currentUser);
   };
 
   const handleLogout = () => {
-    setUser(null);
-    setCurrentPage('map'); // go to map page
+    auth.signOut().then(() => {
+      setUser(null);
+      setCurrentPage('map'); // go to map page
+    }).catch((error) => {
+      console.log("Failde to sign out", error);
+    });
   };
 
   return (
-    <>
-      <nav style={styles.nav}>
+    <div style={styles.page}>
+      <nav style={{ ...styles.nav, display: loaded ? 'block' : 'none' }}>
         <ul style={styles.ul}>
           <li style={styles.li}>
             <button onClick={() => setCurrentPage('map')} style={styles.link}>
@@ -108,7 +119,7 @@ function App() {
       {currentPage === 'user' && (
         <div style={styles.pageContainer}>
           {user ? (
-            <UserHomepage username={user.username} recipes={[]} />
+            <UserHomepage username={user.displayName} recipes={[]} />
           ) : showSignup ? (
             <Signup onSignup={handleSignup} />
           ) : (
@@ -128,11 +139,17 @@ function App() {
           <Recipes/>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
 const styles = {
+  page: {
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100vh',
+    width: '100vw',
+  },
   nav: {
     backgroundColor: '#333',
     padding: '10px',
@@ -161,9 +178,9 @@ const styles = {
     cursor: 'pointer',
   },
   mapContainer: {
-    height: '100vh',
+    height: '100%',
     width: '100%',
-    marginTop: '60px',
+    marginTop: '65.59px',
   },
   pageContainer: {
     marginTop: '60px',

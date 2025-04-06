@@ -15,7 +15,7 @@ const Signup = ({ onSignup }) => {
       const user = userCredential.user;
       await updateProfile(user, { displayName: name }); // Update user's display name
 
-      onSignup(user.uid); // Pass userId to parent
+      onSignup();
     } catch (error) {
       setError(error.message);
     }
