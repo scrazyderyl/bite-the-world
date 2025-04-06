@@ -1,37 +1,43 @@
 .recipes-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .recipe-card {
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    background-color: #fff;
-  }
-  
-  .recipe-title {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-    color: #333;
-  }
-  
-  .recipe-description {
-    margin-bottom: 15px;
-    color: #666;
-  }
-  
-  .ingredient-list {
-    list-style-type: disc;
-    padding-left: 20px;
-  }
-  
-  .ingredient-item {
-    margin-bottom: 5px;
-    color: #444;
-  }
-  
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.recipe-card {
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+}
+
+.recipe-title {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.recipe-description {
+  margin-bottom: 15px;
+  color: #666;
+}
+
+.ingredient-list {
+  list-style-type: disc;
+  padding-left: 20px;
+}
+
+.ingredient-item {
+  margin-bottom: 5px;
+  color: #444;
+}
+
+.recipes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
