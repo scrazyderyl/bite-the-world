@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
 
-// Validation schema and initial values from your RecipeSubmit component
+// initial values from RecipeSubmit component
 const validationSchema = Yup.object({
   name: Yup.string().required("Recipe name is required"),
   prepTime: Yup.string().required("Required"),
@@ -50,14 +50,14 @@ const unitOptions = [
 ];
 
 const UserHomePage = ({ username }) => {
-  const [activeTab, setActiveTab] = useState('myRecipes');
+  const [activeTab, setActiveTab] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [drafts, setDrafts] = useState([]);
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
 
-  // Initialize empty draft
+  //  empty draft
   const emptyDraft = {
     id: Date.now(),
     name: "",
@@ -80,30 +80,30 @@ const UserHomePage = ({ username }) => {
   };
 
   useEffect(() => {
-    // Fetch published recipes
+    // published recipes
     fetch("/recipes.json")
       .then(res => res.json())
       .then(data => setRecipes(data));
     
-    // Load drafts from localStorage
+    // drafts from localStorage
     const savedDrafts = localStorage.getItem('recipeDrafts');
     if (savedDrafts) {
       setDrafts(JSON.parse(savedDrafts));
     }
 
-    // Load bookmarked recipes from localStorage
+    // bookmarked recipes from localStorage
     const savedBookmarks = localStorage.getItem('bookmarkedRecipes');
     if (savedBookmarks) {
       setBookmarkedRecipes(JSON.parse(savedBookmarks));
     }
   }, []);
 
-  // Save drafts to localStorage whenever they change
+  // drafts to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('recipeDrafts', JSON.stringify(drafts));
   }, [drafts]);
 
-  // Save bookmarks to localStorage whenever they change
+  // ookmarks to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem('bookmarkedRecipes', JSON.stringify(bookmarkedRecipes));
   }, [bookmarkedRecipes]);
@@ -142,8 +142,7 @@ const UserHomePage = ({ username }) => {
   };
 
   const handlePublishDraft = (draft) => {
-    // Here you would typically send the draft to your backend API
-    // For now, we'll just add it to the recipes array and remove from drafts
+    // send draft to BACKEND
     const newRecipe = {
       ...draft,
       id: `recipe-${Date.now()}`,
@@ -211,6 +210,17 @@ const UserHomePage = ({ username }) => {
           Bookmarked Recipes
         </button>
       </div>
+
+      {/* Welcome Message - Shown when no tab is selected */}
+      {!activeTab && (
+        <div className="welcome-container">
+          <div className="welcome-message">
+            <h3>Get Started with Bite the World</h3>
+            <p>Select a button to manage your recipes, drafts, or bookmarks.</p>
+            <p>Or create a new recipe by clicking the "Create New Recipe" button</p>
+          </div>
+        </div>
+      )}
 
       {/* My Recipes Tab */}
       {activeTab === 'myRecipes' && (
@@ -544,7 +554,7 @@ const UserHomePage = ({ username }) => {
   );
 };
 
-// CSS styles you'll need to add to your Recipes.css file
+// eslint-disable-next-line no-unused-vars
 const additionalStyles = `
 .user-homepage {
   max-width: 1200px;
@@ -560,13 +570,46 @@ const additionalStyles = `
 }
 
 .create-recipe-btn {
-  background-color: #28a745;
+  background-color: #4CAF50;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(207, 186, 186, 0.5);
+}
+
+.create-recipe-btn:hover {
+  background-color: #45a049;
+}
+
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  margin-top: 30px;
+}
+
+.welcome-message {
+  text-align: center;
+  max-width: 600px;
+  padding: 30px;
+}
+
+.welcome-message h3 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 24px;
+}
+
+.welcome-message p {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 16px;
 }
 
 .tab-navigation {
@@ -581,12 +624,21 @@ const additionalStyles = `
   border: none;
   cursor: pointer;
   font-size: 16px;
+  color: #fff;
+  background-color: #555;
+  margin-right: 5px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab-btn:hover {
+  background-color: #777;
 }
 
 .tab-btn.active {
-  border-bottom: 3px solid #007bff;
+  background-color: #2196F3;
   font-weight: bold;
-  color: #007bff;
+  color: white;
+  text-shadow: 1px 1px 1px rgba(202, 170, 170, 0.3);
 }
 
 .drafts-container {
@@ -604,6 +656,17 @@ const additionalStyles = `
   padding: 15px;
   border-radius: 5px;
   background-color: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(197, 172, 172, 0.1);
+}
+
+.draft-card h3 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.draft-card p {
+  color: #666;
+  margin-bottom: 5px;
 }
 
 .draft-actions {
@@ -617,47 +680,84 @@ const additionalStyles = `
   border: none;
   border-radius: 3px;
   cursor: pointer;
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(198, 178, 178, 0.56);
 }
 
 .draft-actions button:nth-child(1) {
-  background-color: #007bff;
-  color: white;
+  background-color: #2196F3;
 }
 
 .draft-actions button:nth-child(2) {
-  background-color: #28a745;
-  color: white;
+  background-color: #4CAF50;
 }
 
 .draft-actions button:nth-child(3) {
-  background-color: #dc3545;
-  color: white;
+  background-color: #F44336;
+}
+
+.draft-actions button:hover {
+  opacity: 0.9;
 }
 
 .no-drafts, .no-recipes, .no-bookmarks {
   text-align: center;
-  color: #777;
+  color: #ddd;
   padding: 40px 0;
+  font-size: 18px;
+  background-color: rgba(216, 182, 182, 0.44);
+  border-radius: 10px;
 }
 
 .bookmark-btn, .remove-bookmark-btn {
   position: absolute;
   top: 10px;
   right: 10px;
-  background-color: #007bff;
+  background-color: #2196F3;
   color: white;
   border: none;
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(186, 143, 143, 0.3);
+}
+
+.bookmark-btn:hover, .remove-bookmark-btn:hover {
+  opacity: 0.9;
 }
 
 .remove-bookmark-btn {
-  background-color: #dc3545;
+  background-color: #F44336;
 }
 
 .recipe-card {
   position: relative;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.recipe-card h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.recipe-card p, .recipe-card h3 {
+  color: #555;
+}
+
+.recipe-card ul, .recipe-card ol {
+  color: #666;
+  padding-left: 20px;
+}
+
+.recipe-card li {
+  margin-bottom: 5px;
 }
 
 /* Modal Styles */
@@ -667,7 +767,7 @@ const additionalStyles = `
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(165, 90, 90, 0.25);
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -683,6 +783,7 @@ const additionalStyles = `
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .close-modal {
@@ -693,6 +794,11 @@ const additionalStyles = `
   background: none;
   border: none;
   cursor: pointer;
+  color: #555;
+}
+
+.close-modal:hover {
+  color: #000;
 }
 
 .recipe-form {
@@ -718,11 +824,13 @@ const additionalStyles = `
   padding: 10px;
   border-radius: 5px;
   margin-bottom: 10px;
+  border: 1px solid #eee;
 }
 
 .form-group label {
   margin-bottom: 5px;
   font-weight: bold;
+  color: #333;
 }
 
 .form-group input, 
@@ -731,6 +839,16 @@ const additionalStyles = `
   padding: 8px;
   border: 1px solid #ddd;
   border-radius: 3px;
+  background-color: #fff;
+  color: #333;
+}
+
+.form-group input:focus, 
+.form-group select:focus, 
+.form-group textarea:focus {
+  border-color: #2196F3;
+  outline: none;
+  box-shadow: 0 0 3px rgba(33, 150, 243, 0.3);
 }
 
 .step-group {
@@ -743,23 +861,35 @@ const additionalStyles = `
 }
 
 .add-btn {
-  background-color: #28a745;
+  background-color: #4CAF50;
   color: white;
   border: none;
   padding: 8px 15px;
   border-radius: 3px;
   cursor: pointer;
   margin-bottom: 15px;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.add-btn:hover {
+  background-color: #45a049;
 }
 
 .remove-btn {
-  background-color: #dc3545;
+  background-color: #F44336;
   color: white;
   border: none;
   padding: 8px 15px;
   border-radius: 3px;
   cursor: pointer;
   align-self: flex-end;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.remove-btn:hover {
+  background-color: #d32f2f;
 }
 
 .form-buttons {
@@ -770,25 +900,37 @@ const additionalStyles = `
 }
 
 .cancel-btn {
-  background-color: #6c757d;
+  background-color: #9E9E9E;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 3px;
   cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.cancel-btn:hover {
+  background-color: #757575;
 }
 
 .save-btn {
-  background-color: #007bff;
+  background-color: #2196F3;
   color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 3px;
   cursor: pointer;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+.save-btn:hover {
+  background-color: #0b7dda;
 }
 
 .error {
-  color: #dc3545;
+  color: #F44336;
   font-size: 12px;
   margin-top: 3px;
 }
