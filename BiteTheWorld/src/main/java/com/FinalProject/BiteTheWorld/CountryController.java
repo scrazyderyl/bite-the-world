@@ -23,11 +23,10 @@ public class CountryController {
         try {
             CountryInfo countryInfo = contentSystem.getCountryInfo(id);
             List<Recipe> recipes = contentSystem.getRecipesByCountry(id);
-            
+        
             if (countryInfo == null || recipes == null) {
                 return ResponseEntity.notFound().build();
             }
-
             CountryPage countryPage = new CountryPage(countryInfo, recipes);
             return ResponseEntity.ok(countryPage);
         }  catch (Exception e) {

@@ -28,25 +28,23 @@ class ContentSystem {
     private ContentSystem() {
         db = FirebaseConnection.getDatabase();
         countries = new HashMap<>();
-
-        // Get country info
-        // try {
-        //     ApiFuture<QuerySnapshot> request = instance.db.collection("countries").get();
-        //     List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
-
-        //     for (CountryInfo country : countryList) {
-        //         countries.put(country.name, country);
-        //     }
-        // } catch (Exception e) {
-            for (Country country : Country.values()) {
-                CountryInfo countryInfo = new CountryInfo() {{
-                    name = country.name;
-                    summary = "Summary not available";
-                }};
-
-                countries.put(country.name(), countryInfo);
+    
+        try {
+            ApiFuture<QuerySnapshot> request = db.collection("countries").get();
+            List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
+    
+            for (CountryInfo country : countryList) {
+                countries.put(country.name, country);
             }
-        // }
+        } catch (Exception e) {
+            
+            for (Country country : Country.values()) {
+                CountryInfo countryInfo = new CountryInfo();
+                countryInfo.name = country.name;
+                countryInfo.summary = "Summary not available";
+                countries.put(country.name, countryInfo);
+            }
+        }
     }
 
     public static ContentSystem getInstance() {
@@ -93,11 +91,41 @@ class ContentSystem {
     }
 
     public CountryInfo getCountryInfo(String country) {
-        return countries.get(country);
+        CountryInfo info = countries.get(country);
+    
+        if (info != null && "Summary not available".equals(info.summary)) {
+            List<Recipe> recipes = getRecipesByCountry(country);
+            if (recipes != null && !recipes.isEmpty()) {
+                String summary = GeminiIntegration.generateCountrySummary(recipes);
+                if (summary != null) {
+                    info.summary = summary.trim();
+                    db.collection("countries").document(country).set(info);
+                }
+            }
+        }
+    
+        return info;
+    }
+    public void updateRecipeViews(String recipeId, long views) {
+    db.collection("recipes").document(recipeId).update("views", views);
     }
 
     public void updateFeaturedRecipe() {
-        throw new UnsupportedOperationException();
+        try {
+            // this will order the recipes by the amount of views they have
+            ApiFuture<QuerySnapshot> request = db.collection("recipes")
+                .orderBy("views", com.google.cloud.firestore.Query.Direction.DESCENDING)
+                .limit(1)
+                .get();
+    
+            List<Recipe> topRecipes = request.get().toObjects(Recipe.class);
+    
+            if (!topRecipes.isEmpty()) {
+                featuredRecipe = topRecipes.get(0);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Failed to update featured recipe: " + e.getMessage());
+        }
     }
     
     public Recipe getFeaturedRecipe() {
@@ -111,4 +139,5 @@ class ContentSystem {
     public List<Recipe> recommendFromIngredients(Ingredient[] ingredients) {
         throw new UnsupportedOperationException();
     }
+
 }

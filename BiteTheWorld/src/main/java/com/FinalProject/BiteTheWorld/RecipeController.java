@@ -13,6 +13,9 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/recipes")
@@ -29,14 +32,15 @@ public class RecipeController {
     public ResponseEntity<String> get(@PathVariable String id, @RequestBody IdToken idToken) {
         try {
             Recipe recipe = contentSystem.getDocument("recipes", id).toObject(Recipe.class);
-            
+
             if (recipe == null) {
                 return ResponseEntity.notFound().build();
             }
-
+            recipe.views++;
+            contentSystem.updateRecipeViews(id, recipe.views);
             ObjectMapper mapper = new ObjectMapper();
             ObjectWriter writer;
-            
+
             // If user is not logged in
             if (idToken.idToken == null) {
                 writer = mapper.writer().withAttribute("uid", null);
@@ -49,7 +53,7 @@ public class RecipeController {
             String serializedRecipe = writer.writeValueAsString(recipe);
 
             return ResponseEntity.ok(serializedRecipe);
-        }  catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("Erorr: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
@@ -71,6 +75,17 @@ public class RecipeController {
         }
     }
 
+   
+    @GetMapping("/featured")
+    public ResponseEntity<Recipe> getFeaturedRecipe() {
+        contentSystem.updateFeaturedRecipe(); // Refresh top-viewed
+        Recipe featured = contentSystem.getFeaturedRecipe();
+        if (featured == null) {
+            return ResponseEntity.notFound().build();
+        }   
+        return ResponseEntity.ok(featured);
+    }
+    
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id) {
         boolean deleted = contentSystem.deleteById("recipes", id);

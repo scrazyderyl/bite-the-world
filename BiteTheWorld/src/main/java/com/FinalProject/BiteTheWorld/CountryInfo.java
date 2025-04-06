@@ -3,7 +3,7 @@ package com.FinalProject.BiteTheWorld;
 import com.google.cloud.firestore.annotation.DocumentId;
 
 class CountryInfo {
-    @DocumentId private String id;
+    @DocumentId public String id;
     public String name;
     public String summary;
 
