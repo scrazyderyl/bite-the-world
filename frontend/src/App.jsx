@@ -13,6 +13,7 @@ import './App.css';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [countryname, setCountryname] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
