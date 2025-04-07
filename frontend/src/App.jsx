@@ -53,7 +53,7 @@ function App() {
       console.log(`Clicked at Longitude: ${lng}, Latitude: ${lat}`);
       let countrydata = await fetchCountry(lng, lat);
       setCountryname(countrydata.features[0].properties.context.country.name);
-      console.log(countryname);
+      setCurrentPage('recipes');
       
     });
   
@@ -97,11 +97,6 @@ function App() {
               User
             </button>
           </li>
-          <li style={styles.li}>
-            { countryname ? <button onClick={() => setCurrentPage('recipes')} style={styles.link}>
-              Recipes for {countryname}
-            </button> : null}
-          </li>
           {user && (
             <li style={styles.li}>
               <button onClick={handleLogout} style={styles.link}>
@@ -135,7 +130,7 @@ function App() {
         <div>
           <h2>Recipes</h2>
           <p>Your saved recipes will appear here.</p>
-          <RecipeSubmit/>
+          <RecipeSubmit user={user}/>
           <Recipes/>
         </div>
       )}
