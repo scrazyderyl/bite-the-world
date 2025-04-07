@@ -133,11 +133,96 @@ class ContentSystem {
     }
 
     public List<Recipe> recommendFromHistory(History history) {
-        throw new UnsupportedOperationException();
+        if (history == null || history.getPostViews().isEmpty()) {
+            return List.of(); 
+        }
+        try {
+            HashMap<String,Integer> countryFrequency = new HashMap<>();
+            List<String> postViews = history.getPostViews();
+            for (int i = 0; i < postViews.size(); i++) {
+                String recipeId = postViews.get(i);
+    
+                DocumentSnapshot snapshot = getDocument("recipes", recipeId);
+                Recipe recipe = snapshot.toObject(Recipe.class);
+    
+                if (recipe != null && recipe.countries != null) {
+                    for (int j = 0; j < recipe.countries.size(); j++) {
+                        Country country = recipe.countries.get(j);
+                        String countryName = country.name();
+    
+                        if (countryFrequency.containsKey(countryName)) {
+                            int count = countryFrequency.get(countryName);
+                            countryFrequency.put(countryName, count + 1);
+                        } else {
+                            countryFrequency.put(countryName, 1);
+                        }
+                    }
+                }
+            }
+    
+           
+            String topCountry = null;
+            int maxCount = 0;
+    
+            for (String country : countryFrequency.keySet()) {
+                int count = countryFrequency.get(country);
+                if (count > maxCount) {
+                    maxCount = count;
+                    topCountry = country;
+                }
+            }
+    
+            if (topCountry != null) {
+                return getRecipesByCountry(topCountry); 
+            }
+
+            
+        } catch (Exception e) {
+            System.out.println("Error in recommendFromHistory: " + e.getMessage());
+           
+        }
+        return List.of();
+        
     }
 
     public List<Recipe> recommendFromIngredients(Ingredient[] ingredients) {
-        throw new UnsupportedOperationException();
+
+        if (ingredients == null || ingredients.length == 0) {
+            return List.of(); 
+        }
+        try {
+            HashMap<String, Integer> ingredientFrequency = new HashMap<>();
+
+            for (Ingredient ingredient : ingredients) {
+                String ingredientName = ingredient.name;
+                if (ingredientFrequency.containsKey(ingredientName)) {
+                    int count = ingredientFrequency.get(ingredientName);
+                    ingredientFrequency.put(ingredientName, count + 1);
+                } else {
+                    ingredientFrequency.put(ingredientName, 1);
+                }
+            }
+
+        
+            String topIngredient = null;
+            int maxCount = 0;
+
+            for (String ingredient : ingredientFrequency.keySet()) {
+                int count = ingredientFrequency.get(ingredient);
+                if (count > maxCount) {
+                    maxCount = count;
+                    topIngredient = ingredient;
+                }
+            }
+
+            if (topIngredient != null) {
+                return getRecipesByCountry(topIngredient);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in recommendFromIngredients: " + e.getMessage());
+        }
+        return List.of(); 
     }
 
 }
