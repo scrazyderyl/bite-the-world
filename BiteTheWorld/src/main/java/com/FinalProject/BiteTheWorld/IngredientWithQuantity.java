@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 class IngredientWithQuantity {
-    @NotNull
+    // @NotNull
     public int id;
 
     @NotNull
