@@ -1,5 +1,6 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -55,5 +56,20 @@ class Recipe {
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getName'");
+    }
+
+    public String getCountry() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCountry'");
+    }
+
+    public Collection<IngredientWithQuantity> getIngredients() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getIngredients'");
     }
 }

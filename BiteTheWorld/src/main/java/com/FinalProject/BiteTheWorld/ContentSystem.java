@@ -133,57 +133,22 @@ class ContentSystem {
     }
 
     public List<Recipe> recommendFromHistory(History history) {
-        if (history == null || history.getPostViews().isEmpty()) {
-            return List.of(); 
-        }
         try {
-            HashMap<String,Integer> countryFrequency = new HashMap<>();
-            List<String> postViews = history.getPostViews();
-            for (int i = 0; i < postViews.size(); i++) {
-                String recipeId = postViews.get(i);
+            // Fetch all recipes from Firestore
+            ApiFuture<QuerySnapshot> request = db.collection("recipes").get();
+            List<Recipe> allRecipes = request.get().toObjects(Recipe.class);
     
-                DocumentSnapshot snapshot = getDocument("recipes", recipeId);
-                Recipe recipe = snapshot.toObject(Recipe.class);
+            // Call Gemini to generate recommendations
+            String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
     
-                if (recipe != null && recipe.countries != null) {
-                    for (int j = 0; j < recipe.countries.size(); j++) {
-                        Country country = recipe.countries.get(j);
-                        String countryName = country.name();
-    
-                        if (countryFrequency.containsKey(countryName)) {
-                            int count = countryFrequency.get(countryName);
-                            countryFrequency.put(countryName, count + 1);
-                        } else {
-                            countryFrequency.put(countryName, 1);
-                        }
-                    }
-                }
-            }
-    
-           
-            String topCountry = null;
-            int maxCount = 0;
-    
-            for (String country : countryFrequency.keySet()) {
-                int count = countryFrequency.get(country);
-                if (count > maxCount) {
-                    maxCount = count;
-                    topCountry = country;
-                }
-            }
-    
-            if (topCountry != null) {
-                return getRecipesByCountry(topCountry); 
-            }
-
-            
+            // Parse and return the recommended recipes
+            return GeminiIntegration.parseRecommendations(json);
         } catch (Exception e) {
             System.out.println("Error in recommendFromHistory: " + e.getMessage());
-           
+            return List.of(); 
         }
-        return List.of();
-        
     }
+    
 
     public List<Recipe> recommendFromIngredients(Ingredient[] ingredients) {
 
