@@ -181,7 +181,7 @@ class ContentSystem {
             }
 
             if (topIngredient != null) {
-                return getRecipesByCountry(topIngredient);
+                return getRecipesByCountry(topIngredient, 100);
             }
 
         } catch (Exception e) {
