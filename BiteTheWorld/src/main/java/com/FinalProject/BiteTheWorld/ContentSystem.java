@@ -133,11 +133,61 @@ class ContentSystem {
     }
 
     public List<Recipe> recommendFromHistory(History history) {
-        throw new UnsupportedOperationException();
+        try {
+            // Fetch all recipes from Firestore
+            ApiFuture<QuerySnapshot> request = db.collection("recipes").get();
+            List<Recipe> allRecipes = request.get().toObjects(Recipe.class);
+    
+            // Call Gemini to generate recommendations
+            String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
+    
+            // Parse and return the recommended recipes
+            return GeminiIntegration.parseRecommendations(json);
+        } catch (Exception e) {
+            System.out.println("Error in recommendFromHistory: " + e.getMessage());
+            return List.of(); 
+        }
     }
+    
 
     public List<Recipe> recommendFromIngredients(Ingredient[] ingredients) {
-        throw new UnsupportedOperationException();
+
+        if (ingredients == null || ingredients.length == 0) {
+            return List.of(); 
+        }
+        try {
+            HashMap<String, Integer> ingredientFrequency = new HashMap<>();
+
+            for (Ingredient ingredient : ingredients) {
+                String ingredientName = ingredient.name;
+                if (ingredientFrequency.containsKey(ingredientName)) {
+                    int count = ingredientFrequency.get(ingredientName);
+                    ingredientFrequency.put(ingredientName, count + 1);
+                } else {
+                    ingredientFrequency.put(ingredientName, 1);
+                }
+            }
+
+        
+            String topIngredient = null;
+            int maxCount = 0;
+
+            for (String ingredient : ingredientFrequency.keySet()) {
+                int count = ingredientFrequency.get(ingredient);
+                if (count > maxCount) {
+                    maxCount = count;
+                    topIngredient = ingredient;
+                }
+            }
+
+            if (topIngredient != null) {
+                return getRecipesByCountry(topIngredient);
+            }
+
+        } catch (Exception e) {
+            System.out.println("Error in recommendFromIngredients: " + e.getMessage());
+        }
+        return List.of(); 
     }
 
 }
