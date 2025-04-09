@@ -7,18 +7,20 @@ import "react-toastify/dist/ReactToastify.css";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
 
-const DEFAULT_VALUES = {
-  name: "",
-  tags: [],
-  countries: [],
-  description: "",
-  images: [],
-  prepTime: "",
-  cookTime: "",
-  servings: "",
-  ingredients: [],
-  directions: [],
-  notes: "",
+function getDefaultValues() {
+  return {
+    name: "",
+    tags: [],
+    countries: [],
+    description: "",
+    images: [],
+    prepTime: "",
+    cookTime: "",
+    servings: "",
+    ingredients: [],
+    directions: [],
+    notes: "",
+  };
 };
 
 const validationSchema = Yup.object({
@@ -71,10 +73,7 @@ const validationSchema = Yup.object({
 });
 
 function RecipeForm({values}) {
-  <div style={styles.formContainer}>
-    <div style={styles.section}>
-      <h1 style={styles.title}>Add a new recipe</h1>
-    </div>
+  return <div style={styles.formContainer}>
     <Formik
       validationSchema={validationSchema}
       initialValues={values}
@@ -139,6 +138,9 @@ function RecipeForm({values}) {
                 />
               </div>
             </div>
+            <h1 style={styles.subheading}>
+              Overview
+            </h1>
             <div style={{...styles.fieldsHorizontal, gridTemplateRows: "1fr 30px"}}>
               <Field
                 as="textarea"
@@ -154,46 +156,7 @@ function RecipeForm({values}) {
                 />
               </div>
             </div>
-          </div>
-          <div style={styles.section}>
-            <div style={styles.formHorizontal}>
-              <h1 style={styles.subheading}>
-                Select Countries
-              </h1>
-              <Field
-                as="select"
-                name="countries"
-                multiple
-                size="10"
-                style={{ ...styles.input, ...styles.countrySelect }}
-                onChange={(event) => {
-                  const options = event.target.options;
-                  const selectedValues = [];
-                  for (let i = 0; i < options.length; i++) {
-                    if (options[i].selected) {
-                      selectedValues.push(options[i].value);
-                    }
-                  }
-                  setFieldValue("countries", selectedValues);
-                }}
-              >
-                {Object.entries(countries).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </Field>
-              <div>
-                <ErrorMessage
-                  name="countries"
-                  component="div"
-                  style={styles.fieldError}
-                />
-              </div>
-            </div>
-          </div>
-          <div style={styles.section}>
-            <div style={styles.fieldsHorizontal}>
+            <div style={ styles.fieldsHorizontal }>
               <Field
                 style={styles.input}
                 name="prepTime"
@@ -236,13 +199,52 @@ function RecipeForm({values}) {
             </div>
           </div>
           <div style={styles.section}>
+            <h1 style={styles.subheading}>
+              Select Countries
+            </h1>
+            <Field
+              as="select"
+              name="countries"
+              multiple
+              size="10"
+              style={{ ...styles.input, ...styles.countrySelect }}
+              onChange={(event) => {
+                const options = event.target.options;
+                const selectedValues = [];
+                for (let i = 0; i < options.length; i++) {
+                  if (options[i].selected) {
+                    selectedValues.push(options[i].value);
+                  }
+                }
+                setFieldValue("countries", selectedValues);
+              }}
+            >
+              {Object.entries(countries).map(([key, value]) => (
+                <option key={key} value={key}>
+                  {value}
+                </option>
+              ))}
+            </Field>
+            <div>
+              <ErrorMessage
+                name="countries"
+                component="div"
+                style={styles.fieldError}
+              />
+            </div>
+          </div>
+          <div style={styles.section}>
             <FieldArray name="ingredients">
               {({ remove, push }) => (
                 <div>
-                  <h1 style={styles.subheading}>Add Ingredients</h1>
+                  <h1 style={styles.subheading}>Ingredients</h1>
                   {values.ingredients.length > 0 &&
                     values.ingredients.map((ingredient, index) => (
-                      <div key={index} style={{...styles.fieldsHorizontal, gridTemplateColumns: "120px 120px 120px 120px 180px 120px"}}>
+                      <div key={index} style={{
+                        ...styles.fieldsHorizontal,
+                        gridTemplateRows: "1fr 60px",
+                        gridTemplateColumns: "160px 120px 120px 120px 180px 120px",
+                        }}>
                         <Field
                           style={styles.input}
                           name={`ingredients.${index}.id`}
@@ -350,7 +352,7 @@ function RecipeForm({values}) {
             <FieldArray name="directions">
               {({ remove, push }) => (
                 <div>
-                  <h1 style={styles.subheading}>Add Steps to cook</h1>
+                  <h1 style={styles.subheading}>Directions</h1>
                   {values.directions.length > 0 &&
                     values.directions.map((step, index) => (
                       <div
@@ -368,7 +370,7 @@ function RecipeForm({values}) {
                             as="textarea"
                             style={styles.longText}
                             name={`directions.${index}`}
-                            placeholder="Describe the step..."
+                            placeholder="Describe the step"
                             type="text"
                           />
                           <div>
@@ -412,7 +414,7 @@ function RecipeForm({values}) {
               <Field
                 as="textarea"
                 name="notes"
-                placeholder="Add any additional notes here..."
+                placeholder="Optional"
                 style={styles.longText}
               />
             </div>
@@ -431,14 +433,13 @@ const styles = {
   stepLabel: {
     fontSize: "18px",
     fontWeight: "bold",
-    color: "#000000",
+    color: "white",
     marginBottom: "5px",
     display: "block",
   },
 
   formContainer: {
     maxWidth: "900px",
-    margin: "auto",
     padding: "20px",
     backgroundColor: "#636d73",
     borderRadius: "10px",
@@ -458,10 +459,9 @@ const styles = {
   },
 
   subheading: {
-    textAlign: "center",
     fontSize: "24px",
     fontWeight: "bold",
-    color: "#333",
+    color: "white",
     marginTop: "0",
     marginBottom: "10px",
   },
@@ -532,4 +532,4 @@ const styles = {
 
 };
 
-export { RecipeForm, DEFAULT_VALUES} ;
+export { RecipeForm, getDefaultValues} ;
