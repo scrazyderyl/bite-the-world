@@ -10,6 +10,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
 
@@ -34,16 +35,10 @@ class ContentSystem {
             List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
     
             for (CountryInfo country : countryList) {
-                countries.put(country.name, country);
+                countries.put(country.id, country);
             }
         } catch (Exception e) {
-            
-            for (Country country : Country.values()) {
-                CountryInfo countryInfo = new CountryInfo();
-                countryInfo.name = country.name;
-                countryInfo.summary = "Summary not available";
-                countries.put(country.name, countryInfo);
-            }
+            System.out.println("Failed to fetch country info!");
         }
     }
 
@@ -80,8 +75,12 @@ class ContentSystem {
         }        
     }
 
-    public List<Recipe> getRecipesByCountry(String country) {
-        ApiFuture<QuerySnapshot> request = db.collection("recipes").whereArrayContains("countries", country).get();
+    public void updateRecipeViews(String recipeId, long views) {
+        db.collection("recipes").document(recipeId).update("views", views);
+    }
+
+    public List<Recipe> getRecipesByCountry(String country_code, int count) {
+        ApiFuture<QuerySnapshot> request = db.collection("recipes").whereArrayContains("countries", country_code).limit(count).get();
         
         try {
             return request.get().toObjects(Recipe.class);
@@ -90,24 +89,25 @@ class ContentSystem {
         }
     }
 
-    public CountryInfo getCountryInfo(String country) {
-        CountryInfo info = countries.get(country);
-    
-        if (info != null && "Summary not available".equals(info.summary)) {
-            List<Recipe> recipes = getRecipesByCountry(country);
-            if (recipes != null && !recipes.isEmpty()) {
-                String summary = GeminiIntegration.generateCountrySummary(recipes);
-                if (summary != null) {
-                    info.summary = summary.trim();
-                    db.collection("countries").document(country).set(info);
-                }
-            }
-        }
-    
-        return info;
+    public CountryInfo getCountryInfo(String country_code) {
+        return countries.get(country_code);
     }
-    public void updateRecipeViews(String recipeId, long views) {
-    db.collection("recipes").document(recipeId).update("views", views);
+
+    public void updateCountrySummary(String country_code) {
+        List<Recipe> recipes = getRecipesByCountry(country_code, 20);
+
+        if (recipes == null || recipes.isEmpty()) {
+            return;
+        }
+
+        String summary = GeminiIntegration.generateCountrySummary(recipes);
+
+        // Update cache
+        CountryInfo countryInfo = countries.get(country_code);
+        countryInfo.summary = summary;
+        
+        // Update database
+        db.collection("countries").document(country_code).update("summary", summary);
     }
 
     public void updateFeaturedRecipe() {

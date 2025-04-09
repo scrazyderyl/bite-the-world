@@ -1,4 +1,5 @@
 import { React } from "react";
+import { auth } from "./firebaseConfig";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
@@ -6,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
 
-const initialValues = {
+const DEFAULT_VALUES = {
   name: "",
   tags: [],
   countries: [],
@@ -69,17 +70,17 @@ const validationSchema = Yup.object({
   notes: Yup.string(),
 });
 
-const RecipeSubmit = ({user}) => (
+function RecipeForm({values}) {
   <div style={styles.formContainer}>
     <div style={styles.section}>
       <h1 style={styles.title}>Add a new recipe</h1>
     </div>
     <Formik
       validationSchema={validationSchema}
-      initialValues={initialValues}
+      initialValues={values}
       onSubmit={async (values) => {
         try {
-          const idToken = await user.getIdToken();
+          const idToken = await auth.currentUser.getIdToken();
 
           const body = {
             idToken: idToken,
@@ -424,7 +425,7 @@ const RecipeSubmit = ({user}) => (
       )}
     </Formik>
   </div>
-);
+};
 
 const styles = {
   stepLabel: {
@@ -531,4 +532,4 @@ const styles = {
 
 };
 
-export default RecipeSubmit;
+export { RecipeForm, DEFAULT_VALUES} ;

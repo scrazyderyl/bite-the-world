@@ -56,4 +56,10 @@ class Recipe {
     public String getId() {
         return id;
     }
+
+    public RecipeOverview toListing() {
+        String thumbnail = images.isEmpty() ? null : images.get(0);
+
+        return new RecipeOverview(id, thumbnail, name, ratings.average(), servings, prepTime + cookTime);
+    }
 }

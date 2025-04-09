@@ -5,15 +5,14 @@ import { auth } from "./firebaseConfig";
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
-import RecipeSubmit from './RecipeSubmit';
-import Recipes from './Recipes';
+import Country from './Country'
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
-  const [countryname, setCountryname] = useState(null);
+  const [country, setCountry] = useState(null);
   const mapRef = useRef();
   const mapContainerRef = useRef();
   const [user, setUser] = useState();
@@ -52,8 +51,8 @@ function App() {
       const { lng, lat } = event.lngLat; // Get clicked coordinates
       console.log(`Clicked at Longitude: ${lng}, Latitude: ${lat}`);
       let countrydata = await fetchCountry(lng, lat);
-      setCountryname(countrydata.features[0].properties.context.country.name);
-      setCurrentPage('recipes');
+      setCountry(countrydata.features[0].properties.context.country);
+      setCurrentPage('country');
       
     });
   
@@ -79,12 +78,41 @@ function App() {
       setUser(null);
       setCurrentPage('map'); // go to map page
     }).catch((error) => {
-      console.log("Failde to sign out", error);
+      console.log("Failed to sign out", error);
     });
   };
 
+  function getPage() {
+    switch (currentPage) {
+      case "map": return <div id="map-container" ref={mapContainerRef} style={styles.mapContainer} />
+      case "user":
+        if (user) {
+          return <div style={styles.pagePadding}>
+            <UserHomepage username={user.displayName} recipes={[]} />
+          </div>
+        } else if (showSignup) {
+          return <div style={styles.pagePadding}>
+            <Signup onSignup={handleSignup} />
+            <button onClick={() => setShowSignup(false)} style={styles.toggleButton}>
+              Back to Login
+            </button>
+          </div>
+        } else {
+          return <div style={styles.pagePadding}>
+            <Login onLogin={handleLogin} />
+            <button onClick={() => setShowSignup(true)} style={styles.toggleButton}>
+              Create an Account
+            </button>
+          </div>
+        }
+      case "country": return <div style={styles.pagePadding}>
+        <Country country={country}/>
+      </div>
+    }
+  }
+
   return (
-    <div style={styles.page}>
+    <>
       <nav style={{ ...styles.nav, display: loaded ? 'block' : 'none' }}>
         <ul style={styles.ul}>
           <li style={styles.li}>
@@ -107,44 +135,14 @@ function App() {
         </ul>
       </nav>
 
-      {currentPage === 'map' && (
-        <div id="map-container" ref={mapContainerRef} style={styles.mapContainer} />
-      )}
-
-      {currentPage === 'user' && (
-        <div style={styles.pageContainer}>
-          {user ? (
-            <UserHomepage username={user.displayName} recipes={[]} />
-          ) : showSignup ? (
-            <Signup onSignup={handleSignup} />
-          ) : (
-            <Login onLogin={handleLogin} />
-          )}
-          <button onClick={() => setShowSignup(!showSignup)} style={styles.toggleButton}>
-            {showSignup ? 'Back to Login' : 'Create an Account'}
-          </button>
-        </div>
-      )}
-
-      {currentPage === 'recipes' && (
-        <div>
-          <h2>Recipes</h2>
-          <p>Your saved recipes will appear here.</p>
-          <RecipeSubmit user={user}/>
-          <Recipes/>
-        </div>
-      )}
-    </div>
+      <div style={styles.page}>
+          {getPage()}
+      </div>
+    </>
   );
 }
 
 const styles = {
-  page: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100vh',
-    width: '100vw',
-  },
   nav: {
     backgroundColor: '#333',
     padding: '10px',
@@ -172,14 +170,17 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
   },
-  mapContainer: {
-    height: '100%',
+  page: {
+    position: 'absolute',
+    paddingTop: '65.59px',
     width: '100%',
-    marginTop: '65.59px',
+    height: 'calc(100% - 65.59px)',
   },
-  pageContainer: {
-    marginTop: '60px',
-    padding: '20px',
+  pagePadding: {
+    paddingTop: '20px',
+    paddingBottom: '20px',
+    paddingLeft: '40px',
+    paddingRight: '40px'
   },
   toggleButton: {
     marginTop: '10px',
