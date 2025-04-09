@@ -1,11 +1,11 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,16 +18,29 @@ public class CountryController {
         this.contentSystem = ContentSystem.getInstance();
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<CountryPage> get(@PathVariable String id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<CountryOverview> get(@PathVariable String id) {
         try {
             CountryInfo countryInfo = contentSystem.getCountryInfo(id);
-            List<Recipe> recipes = contentSystem.getRecipesByCountry(id);
-        
-            if (countryInfo == null || recipes == null) {
+
+            if (countryInfo == null) {
                 return ResponseEntity.notFound().build();
             }
-            CountryPage countryPage = new CountryPage(countryInfo, recipes);
+
+            List<Recipe> recipes = contentSystem.getRecipesByCountry(id, 20);
+            List<RecipeOverview> listings;
+
+            if (recipes == null) {
+                listings = null;
+            } else {
+                listings = new ArrayList<>(recipes.size());
+
+                for (Recipe recipe : recipes) {
+                    listings.add(recipe.toListing());
+                }
+            }
+
+            CountryOverview countryPage = new CountryOverview(countryInfo, listings);
             return ResponseEntity.ok(countryPage);
         }  catch (Exception e) {
             System.out.println("Erorr: " + e.getMessage());

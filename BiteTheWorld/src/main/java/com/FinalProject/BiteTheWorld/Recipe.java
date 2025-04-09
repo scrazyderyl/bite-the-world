@@ -58,18 +58,9 @@ class Recipe {
         return id;
     }
 
-    public String getName() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getName'");
-    }
+    public RecipeOverview toListing() {
+        String thumbnail = images.isEmpty() ? null : images.get(0);
 
-    public String getCountry() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getCountry'");
-    }
-
-    public Collection<IngredientWithQuantity> getIngredients() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getIngredients'");
+        return new RecipeOverview(id, thumbnail, name, ratings.average(), servings, prepTime + cookTime);
     }
 }
