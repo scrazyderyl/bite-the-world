@@ -1,53 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
-import * as Yup from "yup";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
-
-// initial values from RecipeSubmit component
-const validationSchema = Yup.object({
-  name: Yup.string().required("Recipe name is required"),
-  prepTime: Yup.string().required("Required"),
-  cookTime: Yup.string().required("Required"),
-  totalTime: Yup.string().required("Required"),
-  servings: Yup.number().positive().integer().required("Required"),
-  ingredients: Yup.array().of(
-    Yup.object({
-      ingredient: Yup.string().required("Ingredient name is required"),
-      quantity: Yup.number()
-        .positive("Must be a positive number")
-        .required("Required"),
-      unit: Yup.string().required("Select a unit"),
-    })
-  ),
-  steps: Yup.array().of(
-    Yup.object({
-      step: Yup.string().required("Step description is required"),
-    })
-  ),
-});
-
-const unitOptions = [
-  { value: "g", label: "Grams (g)" },
-  { value: "kg", label: "Kilograms (kg)" },
-  { value: "mg", label: "Milligrams (mg)" },
-  { value: "lb", label: "Pounds (lb)" },
-  { value: "oz", label: "Ounces (oz)" },
-  { value: "ml", label: "Milliliters (ml)" },
-  { value: "l", label: "Liters (l)" },
-  { value: "cups", label: "Cups" },
-  { value: "tsp", label: "Teaspoons (tsp)" },
-  { value: "tbsp", label: "Tablespoons (tbsp)" },
-  { value: "pt", label: "Pints (pt)" },
-  { value: "qt", label: "Quarts (qt)" },
-  { value: "gal", label: "Gallons (gal)" },
-  { value: "in", label: "Inches (in)" },
-  { value: "cm", label: "Centimeters (cm)" },
-  { value: "pcs", label: "Pieces" },
-  { value: "pinch", label: "Pinch" },
-  { value: "dash", label: "Dash" },
-];
+import { RecipeForm, getDefaultValues } from './RecipeForm';
 
 const UserHomePage = ({ username }) => {
   const [activeTab, setActiveTab] = useState(null);
@@ -56,28 +11,6 @@ const UserHomePage = ({ username }) => {
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
-
-  //  empty draft
-  const emptyDraft = {
-    id: Date.now(),
-    name: "",
-    prepTime: "",
-    cookTime: "",
-    totalTime: "",
-    servings: "",
-    ingredients: [
-      {
-        ingredient: "",
-        quantity: "",
-        unit: "",
-      },
-    ],
-    steps: [
-      {
-        step: "",
-      },
-    ],
-  };
 
   useEffect(() => {
     // published recipes
@@ -109,7 +42,7 @@ const UserHomePage = ({ username }) => {
   }, [bookmarkedRecipes]);
 
   const handleCreateDraft = () => {
-    setEditingDraft(emptyDraft);
+    setEditingDraft(getDefaultValues());
     setShowDraftModal(true);
   };
 
@@ -345,208 +278,8 @@ const UserHomePage = ({ username }) => {
             }}>×</button>
             
             <h2>{editingDraft?.name ? `Edit Recipe: ${editingDraft.name}` : 'Create New Recipe'}</h2>
-            
-            <Formik
-              validationSchema={validationSchema}
-              initialValues={editingDraft || emptyDraft}
-              onSubmit={(values) => handleSaveDraft(values)}
-            >
-              {({ values }) => (
-                <Form className="recipe-form">
-                  <div className="form-group">
-                    <label htmlFor="name">Recipe Name</label>
-                    <Field
-                      name="name"
-                      placeholder="Recipe Name"
-                      type="text"
-                    />
-                    <ErrorMessage name="name" component="div" className="error" />
-                  </div>
-                  
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="prepTime">Preparation Time</label>
-                      <Field
-                        name="prepTime"
-                        placeholder="e.g., 20 mins"
-                        type="text"
-                      />
-                      <ErrorMessage name="prepTime" component="div" className="error" />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="cookTime">Cook Time</label>
-                      <Field
-                        name="cookTime"
-                        placeholder="e.g., 30 mins"
-                        type="text"
-                      />
-                      <ErrorMessage name="cookTime" component="div" className="error" />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="totalTime">Total Time</label>
-                      <Field
-                        name="totalTime"
-                        placeholder="e.g., 50 mins"
-                        type="text"
-                      />
-                      <ErrorMessage name="totalTime" component="div" className="error" />
-                    </div>
-                    
-                    <div className="form-group">
-                      <label htmlFor="servings">Servings</label>
-                      <Field
-                        name="servings"
-                        placeholder="e.g., 4"
-                        type="number"
-                      />
-                      <ErrorMessage name="servings" component="div" className="error" />
-                    </div>
-                  </div>
-                  
-                  <h3>Ingredients</h3>
-                  <FieldArray name="ingredients">
-                    {({ remove, push }) => (
-                      <div>
-                        {values.ingredients.map((_, index) => (
-                          <div className="form-row ingredient-row" key={index}>
-                            <div className="form-group">
-                              <label htmlFor={`ingredients.${index}.ingredient`}>
-                                Ingredient {index + 1}
-                              </label>
-                              <Field
-                                name={`ingredients.${index}.ingredient`}
-                                placeholder="e.g., Apples"
-                                type="text"
-                              />
-                              <ErrorMessage
-                                name={`ingredients.${index}.ingredient`}
-                                component="div"
-                                className="error"
-                              />
-                            </div>
-                            
-                            <div className="form-group">
-                              <label htmlFor={`ingredients.${index}.quantity`}>
-                                Quantity
-                              </label>
-                              <Field
-                                name={`ingredients.${index}.quantity`}
-                                placeholder="e.g., 2"
-                                type="text"
-                              />
-                              <ErrorMessage
-                                name={`ingredients.${index}.quantity`}
-                                component="div"
-                                className="error"
-                              />
-                            </div>
-                            
-                            <div className="form-group">
-                              <label htmlFor={`ingredients.${index}.unit`}>
-                                Unit
-                              </label>
-                              <Field
-                                as="select"
-                                name={`ingredients.${index}.unit`}
-                              >
-                                <option value="">Select Unit</option>
-                                {unitOptions.map((option) => (
-                                  <option key={option.value} value={option.value}>
-                                    {option.label}
-                                  </option>
-                                ))}
-                              </Field>
-                              <ErrorMessage
-                                name={`ingredients.${index}.unit`}
-                                component="div"
-                                className="error"
-                              />
-                            </div>
-                            
-                            <button
-                              type="button"
-                              className="remove-btn"
-                              onClick={() => remove(index)}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                        
-                        <button
-                          type="button"
-                          className="add-btn"
-                          onClick={() => push({ ingredient: "", quantity: "", unit: "" })}
-                        >
-                          Add Ingredient
-                        </button>
-                      </div>
-                    )}
-                  </FieldArray>
-                  
-                  <h3>Cooking Steps</h3>
-                  <FieldArray name="steps">
-                    {({ remove, push }) => (
-                      <div>
-                        {values.steps.map((_, index) => (
-                          <div className="form-row step-row" key={index}>
-                            <div className="form-group step-group">
-                              <label htmlFor={`steps.${index}.step`}>
-                                Step {index + 1}
-                              </label>
-                              <Field
-                                as="textarea"
-                                name={`steps.${index}.step`}
-                                placeholder="Describe this step..."
-                              />
-                              <ErrorMessage
-                                name={`steps.${index}.step`}
-                                component="div"
-                                className="error"
-                              />
-                            </div>
-                            
-                            <button
-                              type="button"
-                              className="remove-btn"
-                              onClick={() => remove(index)}
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                        
-                        <button
-                          type="button"
-                          className="add-btn"
-                          onClick={() => push({ step: "" })}
-                        >
-                          Add Step
-                        </button>
-                      </div>
-                    )}
-                  </FieldArray>
-                  
-                  <div className="form-buttons">
-                    <button
-                      type="button"
-                      className="cancel-btn"
-                      onClick={() => {
-                        setShowDraftModal(false);
-                        setEditingDraft(null);
-                      }}
-                    >
-                      Cancel
-                    </button>
-                    <button type="submit" className="save-btn">
-                      Save Draft
-                    </button>
-                  </div>
-                </Form>
-              )}
-            </Formik>
+
+            <RecipeForm values={editingDraft}/>
           </div>
         </div>
       )}
