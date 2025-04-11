@@ -1,6 +1,8 @@
+import { Link } from "react-router";
+
 function RecipeCard({ recipe }) {
   return (
-    <a href={`/recipes/${recipe.id}`}>
+    <Link to={`/recipes/${recipe.id}`}>
       <div className="recipe-card" href={`/recipes/${recipe.id}`}>
         <h2 className="recipe-title">{recipe.name}</h2>
         <img src={recipe.thumbnail} />
@@ -8,7 +10,7 @@ function RecipeCard({ recipe }) {
         <p className="recipe-description">Servings: {recipe.servings}</p>
         <p className="recipe-description">Total Time: {recipe.totalTime}</p>
       </div>
-    </a>
+    </Link>
   )
 }
 

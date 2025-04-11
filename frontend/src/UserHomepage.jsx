@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
 import { RecipeForm, getDefaultValues } from './RecipeForm';
 
-const UserHomePage = ({ username }) => {
+const UserHomePage = ({ user }) => {
+  const navigate = useNavigate();
+
   const [activeTab, setActiveTab] = useState(null);
   const [recipes, setRecipes] = useState([]);
   const [drafts, setDrafts] = useState([]);
@@ -13,6 +16,11 @@ const UserHomePage = ({ username }) => {
   const [editingDraft, setEditingDraft] = useState(null);
 
   useEffect(() => {
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
     // published recipes
     fetch("/recipes.json")
       .then(res => res.json())
@@ -30,6 +38,10 @@ const UserHomePage = ({ username }) => {
       setBookmarkedRecipes(JSON.parse(savedBookmarks));
     }
   }, []);
+
+  if (!user) {
+    return;
+  }
 
   // drafts to localStorage whenever they change
   useEffect(() => {
@@ -113,7 +125,7 @@ const UserHomePage = ({ username }) => {
   return (
     <div className="user-homepage">
       <div className="header">
-        <h2>Welcome to Bite the World, {username}!</h2>
+        <h2>Welcome to Bite the World, {user.displayName}!</h2>
         <button 
           className="create-recipe-btn"
           onClick={handleCreateDraft}
