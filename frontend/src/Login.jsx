@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig"; // Import Firebase authentication
 
-const Login = ({ onLogin }) => {
+function Login({ onLogin }) {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,35 +15,43 @@ const Login = ({ onLogin }) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       onLogin();
+      navigate("/");
     } catch (error) {
       setError(error.message);
     }
   };
 
   return (
-    <div style={styles.container}>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          style={styles.input}
-          required
-        />
-        <button type="submit" style={styles.button}>Login</button>
-      </form>
-    </div>
+    <>
+      <div style={styles.container}>
+        <h2>Login</h2>
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={styles.input}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={styles.input}
+            required
+          />
+          <button type="submit" style={styles.button}>Login</button>
+        </form>
+      </div>
+      <Link to="/register">
+        <button style={styles.toggleButton}>
+          Create an Account
+        </button>
+      </Link>
+    </>
   );
 };
 

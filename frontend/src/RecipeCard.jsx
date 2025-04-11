@@ -1,9 +1,10 @@
 import React from "react";
+import { Link } from "react-router";
 import "./RecipeCard.css";
 
 function RecipeCard({ recipe }) {
   return (
-    <a href={`/recipes/${recipe.id}`} className="card-link">
+    <Link to={`/recipes/${recipe.id}`} className="card-link">
       <div className="recipe-card">
         <div className="card-image-container">
           <img 
@@ -32,7 +33,7 @@ function RecipeCard({ recipe }) {
           </div>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
