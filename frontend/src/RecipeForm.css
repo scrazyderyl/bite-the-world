@@ -49,6 +49,15 @@
     transition: border-color 0.3s, box-shadow 0.3s;
   }
   
+  .form-lookup{
+    width: 100%;
+    padding: 12px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    color:black;
+  }
   .form-textarea {
     min-height: 120px;
     resize: vertical;
