@@ -17,6 +17,13 @@ function Navbar({ user, handleLogout }) {
                     </button>
                 </Link>
             </li>
+            <li style={styles.li}>
+                <Link to='/ingredients'>
+                    <button style={styles.link}>
+                        Lookup by Ingredient
+                    </button>
+                </Link>
+            </li>
             {user && (
                 <li style={styles.li}>
                     <button onClick={handleLogout} style={styles.link}>
