@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
-import "./RecipeForm.css"; 
+import "./Form.css"; 
 
 function getDefaultValues() {
   return {
@@ -75,7 +75,7 @@ const validationSchema = Yup.object({
 
 function RecipeForm({ values }) {
   return (
-    <div className="recipe-form-container">
+    <div className="submission-form-container">
       <h1 className="form-title">Create Recipe</h1>
       <Formik
         validationSchema={validationSchema}
@@ -87,7 +87,6 @@ function RecipeForm({ values }) {
               idToken: idToken,
               ...values,
             };
-            console.log(body);
 
             const response = await fetch("http://localhost:8080/recipes/", {
               method: "POST",
