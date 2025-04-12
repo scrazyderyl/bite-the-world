@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
-import { IngredientForm, getDefaultValues } from './IngredientForm';
+import { RecipeForm, getDefaultValues } from './RecipeForm';
 
 const UserHomePage = ({ user }) => {
   const navigate = useNavigate();
@@ -292,7 +292,7 @@ const UserHomePage = ({ user }) => {
             
             <h2>{editingDraft?.name ? `Edit Recipe: ${editingDraft.name}` : 'Create New Recipe'}</h2>
 
-            <IngredientForm values={editingDraft}/>
+            <RecipeForm values={editingDraft}/>
           </div>
         </div>
       )}

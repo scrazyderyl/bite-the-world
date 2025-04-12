@@ -1,8 +1,10 @@
-import { React } from "react";
+import { React, useState } from "react";
+import Async from 'react-select/async';
 import { auth } from "./firebaseConfig";
-import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
+import { Formik, Field, Form, ErrorMessage, FieldArray, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
@@ -74,8 +76,45 @@ const validationSchema = Yup.object({
 });
 
 function RecipeForm({ values }) {
+  const [selectedIngredient, setSelectedIngredient] = useState();
+
+  async function searchIngredient(name, callback) {
+    const error = () => {
+      toast.error("Ingredient lookup failed.", {
+        toastId: "ingredient-lookup-error",
+        position: "top-right",
+        autoClose: 3000,
+      });
+      callback([]);
+    }
+
+    try {
+      const body = {
+        query: name
+      }
+
+      const response = await fetch("http://localhost:8080/ingredients/lookup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        error();
+        return;
+      }
+
+      const ingredients = await response.json();
+      callback(ingredients.map(ingredient => ({ value: ingredient.id, label: ingredient.name })));
+    } catch (e) {
+      error();
+    }
+  }
+
   return (
-    <div className="submission-form-container">
+    <div className="form-container">
       <h1 className="form-title">Create Recipe</h1>
       <Formik
         validationSchema={validationSchema}
@@ -229,108 +268,103 @@ function RecipeForm({ values }) {
 
             <div className="form-section">
               <FieldArray name="ingredients">
-                {({ remove, push }) => (
+                {({ remove, push }) => {
+                  async function addIngredient(option) {
+                    setSelectedIngredient(null);
+
+                    // Check if ingredient already included
+                    for (let ingredient of values.ingredients) {
+                      if (ingredient.id === option.value) {
+                        toast.warn("Ingredient is already added", {
+                          position: "top-right",
+                          autoClose: 3000,
+                        });
+
+                        return;
+                      }
+                    }
+
+                    var newIngredient = {
+                      id: option.value,
+                      name: option.label,
+                      quantity: { numerator: "", denominator: "" },
+                      quantityUnit: "",
+                    };
+                
+                    push(newIngredient);  
+                  }
+
+                  return (
                   <div>
                     <h2 className="form-subheading">Ingredients</h2>
+                    <Async loadOptions={searchIngredient} onChange={addIngredient} value={selectedIngredient} styles={{
+                      option: (provided, state) => ({
+                        ...provided,
+                        color: "black"
+                      })
+                    }}/>
                     {values.ingredients.length > 0 &&
                       values.ingredients.map((ingredient, index) => (
-                        <div key={index} className="ingredient-row">
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.id`}
-                              placeholder="ID"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.id`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.name`}
-                              placeholder="Name"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.name`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.quantity.numerator`}
-                              placeholder="Numerator"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantity.numerator`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.quantity.denominator`}
-                              placeholder="Denominator"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantity.denominator`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              as="select"
-                              className="form-select"
-                              name={`ingredients.${index}.quantityUnit`}
+                        <div key={index}>
+                          <p>{ ingredient.name }</p>
+                          <div className="fields-grid">
+                            <div>
+                              <Field
+                                className="form-input"
+                                name={`ingredients.${index}.quantity.numerator`}
+                                placeholder="Numerator"
+                                type="text"
+                              />
+                              <ErrorMessage
+                                name={`ingredients.${index}.quantity.numerator`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <div>
+                              <Field
+                                className="form-input"
+                                name={`ingredients.${index}.quantity.denominator`}
+                                placeholder="Denominator"
+                                type="text"
+                              />
+                              <ErrorMessage
+                                name={`ingredients.${index}.quantity.denominator`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <div>
+                              <Field
+                                as="select"
+                                className="form-select"
+                                name={`ingredients.${index}.quantityUnit`}
+                              >
+                                <option value="" label="Select a unit" hidden />
+                                {units.map((option) => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </Field>
+                              <ErrorMessage
+                                name={`ingredients.${index}.quantityUnit`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <button
+                              className="remove-button"
+                              type="button"
+                              onClick={() => remove(index)}
                             >
-                              <option value="" label="Select a unit" hidden />
-                              {units.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </Field>
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantityUnit`}
-                              component="div"
-                              className="field-error"
-                            />
+                              Remove
+                            </button>
                           </div>
-                          <button
-                            className="remove-button"
-                            type="button"
-                            onClick={() => remove(index)}
-                          >
-                            Remove
-                          </button>
                         </div>
                       ))}
-                    <button
-                      className="add-button"
-                      type="button"
-                      onClick={() =>
-                        push({
-                          id: "",
-                          name: "",
-                          quantity: { numerator: "", denominator: "" },
-                          quantityUnit: "",
-                        })
-                      }
-                    >
-                      Add Ingredient
-                    </button>
                   </div>
-                )}
+                )}}
               </FieldArray>
             </div>
 

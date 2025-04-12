@@ -25,7 +25,7 @@ const validationSchema = Yup.object({
 
 function IngredientForm({ values }) {
   return (
-    <div className="submission-form-container">
+    <div className="form-container">
       <h1 className="form-title">Create Ingredient</h1>
       <Formik
         validationSchema={validationSchema}
