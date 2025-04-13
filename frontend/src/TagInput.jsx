@@ -1,5 +1,7 @@
 import { React, useState, useRef, useEffect } from 'react';
 
+import './TagInput.css';
+
 function TagInput({ tags, push, remove }) {
   const [isAdding, setIsAdding] = useState(false);
   const [newTag, setNewTag] = useState('');

@@ -3,8 +3,9 @@ import { toast } from "react-toastify";
 import Async from 'react-select/async';
 import { Formik, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
-import "react-toastify/dist/ReactToastify.css";
+
 import "./Form.css";
+import "./IngredientLookup.css";
 
 function getDefaultValues() {
   return {

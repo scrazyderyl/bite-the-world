@@ -1,14 +1,13 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.List;
+
 import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.database.annotations.NotNull;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-
-import java.util.List;
 
 class RecipeSubmission {
     public String idToken;
@@ -22,6 +21,7 @@ class RecipeSubmission {
     @NotEmpty
     public List<Country> countries;
 
+    @NotBlank
     public String description;
 
     public List<String> images;

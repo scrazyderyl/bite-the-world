@@ -6,6 +6,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 
 import TagInput from "./TagInput";
+import ImageSelector from "./ImageSelector";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
 import "./Form.css"; 
@@ -34,7 +35,7 @@ const validationSchema = Yup.object({
   countries: Yup.array()
     .of(Yup.string())
     .min(1, "At least one country must be selected"),
-  description: Yup.string(),
+  description: Yup.string().required("Required"),
   images: Yup.array().of(
     Yup.string().url("Each image must be a valid URL")
   ),
@@ -198,102 +199,123 @@ function RecipeForm({ values }) {
               </div>
 
               <h3 className="form-subheading">Overview</h3>
-              <div className="fields-grid">
-                <Field
-                  as="textarea"
-                  name="description"
-                  placeholder="Describe your recipe"
-                  className="form-textarea"
-                />
+              <div style={{ display: "grid", gridTemplateColumns: "min-content 1fr", columnGap: "50px" }}>
                 <div>
-                  <ErrorMessage
-                    name="description"
-                    component="div"
-                    className="field-error"
-                  />
-                </div>
-              </div>
+                  <div className="fields-grid">
+                    <Field
+                      as="textarea"
+                      name="description"
+                      placeholder="Describe your recipe"
+                      className="form-textarea"
+                    />
+                    <div>
+                      <ErrorMessage
+                        name="description"
+                        component="div"
+                        className="field-error"
+                      />
+                    </div>
+                  </div>
 
-              <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
-                <Field
-                  className="form-input"
-                  name="prepTime"
-                  placeholder="Prep Time (mins)"
-                  type="text"
-                />
-                <div>
-                  <ErrorMessage
-                    name="prepTime"
-                    component="div"
-                    className="field-error"
-                  />
+                  <div>
+                    <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
+                      <Field
+                        className="form-input"
+                        name="prepTime"
+                        placeholder="Prep Time (mins)"
+                        type="text"
+                      />
+                      <div>
+                        <ErrorMessage
+                          name="prepTime"
+                          component="div"
+                          className="field-error"
+                        />
+                      </div>
+                      <Field
+                        className="form-input"
+                        name="cookTime"
+                        placeholder="Cook Time (mins)"
+                        type="text"
+                      />
+                      <div>
+                        <ErrorMessage
+                          name="cookTime"
+                          component="div"
+                          className="field-error"
+                        />
+                      </div>
+                      <Field
+                        className="form-input"
+                        name="servings"
+                        placeholder="Servings"
+                        type="text"
+                      />
+                      <div>
+                        <ErrorMessage
+                          name="servings"
+                          component="div"
+                          className="field-error"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <Field
-                  className="form-input"
-                  name="cookTime"
-                  placeholder="Cook Time (mins)"
-                  type="text"
-                />
+
                 <div>
-                  <ErrorMessage
-                    name="cookTime"
-                    component="div"
-                    className="field-error"
-                  />
-                </div>
-                <Field
-                  className="form-input"
-                  name="servings"
-                  placeholder="Servings"
-                  type="text"
-                />
-                <div>
-                  <ErrorMessage
-                    name="servings"
-                    component="div"
-                    className="field-error"
-                  />
+                  <p className="label-top">Origin</p>
+                  <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
+                    <Field
+                      as="select"
+                      name="countries"
+                      multiple
+                      className="form-select"
+                      style={{ height: "200px" }}
+                      onChange={(event) => {
+                        const options = event.target.options;
+                        const selectedValues = [];
+                        for (let i = 0; i < options.length; i++) {
+                          if (options[i].selected) {
+                            selectedValues.push(options[i].value);
+                          }
+                        }
+                        setFieldValue("countries", selectedValues);
+                      }}
+                    >
+                      {Object.entries(countries).map(([key, value]) => (
+                        <option key={key} value={key}>
+                          {value}
+                        </option>
+                      ))}
+                    </Field>
+                    <div>
+                      <ErrorMessage
+                        name="countries"
+                        component="div"
+                        className="field-error"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="form-section">
-              <h2 className="form-subheading">Origin</h2>
-              <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
-                <Field
-                  as="select"
-                  name="countries"
-                  multiple
-                  className="form-select"
-                  style={{ height: "200px" }}
-                  onChange={(event) => {
-                    const options = event.target.options;
-                    const selectedValues = [];
-                    for (let i = 0; i < options.length; i++) {
-                      if (options[i].selected) {
-                        selectedValues.push(options[i].value);
-                      }
-                    }
-                    setFieldValue("countries", selectedValues);
-                  }}
-                >
-                  {Object.entries(countries).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value}
-                    </option>
-                  ))}
-                </Field>
-                <div>
-                  <ErrorMessage
-                    name="countries"
-                    component="div"
-                    className="field-error"
+              <h2 className="form-subheading">Images</h2>
+              <FieldArray name="images">
+                {({ push, remove, insert }) => (
+                  <ImageSelector
+                    images={values.images}
+                    push={push}
+                    remove={remove}
+                    insert={insert}
                   />
-                </div>
-              </div>
+                )}
+              </FieldArray>
             </div>
 
             <div className="form-section">
+              <h2 className="form-subheading">Ingredients</h2>
               <FieldArray name="ingredients">
                 {({ remove, push }) => {
                   async function addIngredient(option) {
@@ -323,7 +345,6 @@ function RecipeForm({ values }) {
 
                   return (
                   <div>
-                    <h2 className="form-subheading">Ingredients</h2>
                     <Async loadOptions={searchIngredient} onChange={addIngredient} value={selectedIngredient} styles={{
                       option: (provided, state) => ({
                         ...provided,
@@ -380,6 +401,11 @@ function RecipeForm({ values }) {
                   </div>
                 )}}
               </FieldArray>
+              {/* <ErrorMessage
+                name="ingredients"
+                component="div"
+                className="field-error"
+              /> */}
             </div>
 
             <div className="form-section">
