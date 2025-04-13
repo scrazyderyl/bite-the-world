@@ -1,12 +1,14 @@
-import { React } from "react";
+import { React, useState } from "react";
+import Async from 'react-select/async';
 import { auth } from "./firebaseConfig";
-import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
+import { Formik, Field, Form, ErrorMessage, FieldArray, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
-import "./RecipeForm.css"; 
+import "./Form.css"; 
 
 function getDefaultValues() {
   return {
@@ -37,45 +39,102 @@ const validationSchema = Yup.object({
     Yup.string().url("Each image must be a valid URL")
   ),
   prepTime: Yup.number()
-    .typeError("Must be a positive number")
-    .positive("Must be a positive number"),
+    .typeError("Must be a number")
+    .integer("Must be a whole number")
+    .positive("Must be positive"),
   cookTime: Yup.number()
-    .typeError("Must be a positive number")
-    .positive("Must be a positive number"),
+  .typeError("Must be a number")
+  .integer("Must be a whole number")
+  .positive("Must be positive"),
   servings: Yup.number()
-    .typeError("Must be a positive number")
-    .positive("Must be a positive number"),
+  .typeError("Must be a number")
+  .integer("Must be a whole number")
+  .positive("Must be positive"),
   ingredients: Yup.array()
     .of(
       Yup.object({
-        id: Yup.number()
-          .typeError("Ingredient ID must be a number")
-          .required("Required"),
-        name: Yup.string().required("Ingredient name is required"),
-        quantity: Yup.object({
-          numerator: Yup.number()
-            .typeError("Must be a positive number")
-            .positive("Must be a positive number")
-            .required("Required"),
-          denominator: Yup.number()
-            .typeError("Must be a positive number")
-            .positive("Must be a positive number")
-            .required("Required"),
-        }),
+        id: Yup.string(),
+        name: Yup.string().required("Required"),
+        quantity: Yup.string().required("Required")
+          .test(
+            'is-valid-number-or-fraction',
+            'Must be a positive number (integer, decimal, or fraction)',
+            (value) => {
+              if (!value) return false;
+        
+              // Remove spaces
+              const trimmed = value.replace(" ", "");
+        
+              // Check for integer or decimal
+              const numberPattern = /^[+]?\d+(\.\d+)?$/;
+        
+              // Check for fraction (e.g., 1/2, 3/4)
+              const fractionPattern = /^[+]?\d+\/\d+$/;
+        
+              if (numberPattern.test(trimmed)) {
+                return parseFloat(trimmed) > 0;
+              }
+        
+              if (fractionPattern.test(trimmed)) {
+                const [numerator, denominator] = trimmed.split('/').map(Number);
+                return denominator !== 0 && numerator / denominator > 0;
+              }
+        
+              return false;
+            }),
         quantityUnit: Yup.string()
           .required("Required")
       })
     )
     .min(1, "At least one ingredient is required"),
   directions: Yup.array()
-    .of(Yup.string().required("Each step is required"))
+    .of(
+      Yup.string().required("Required")
+    )
     .min(1, "At least one step is required"),
   notes: Yup.string(),
 });
 
 function RecipeForm({ values }) {
+  const [selectedIngredient, setSelectedIngredient] = useState();
+
+  async function searchIngredient(name, callback) {
+    const error = () => {
+      toast.error("Ingredient lookup failed.", {
+        toastId: "ingredient-lookup-error",
+        position: "top-right",
+        autoClose: 3000,
+      });
+      callback([]);
+    }
+
+    try {
+      const body = {
+        query: name
+      }
+
+      const response = await fetch("http://localhost:8080/ingredients/lookup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        error();
+        return;
+      }
+
+      const ingredients = await response.json();
+      callback(ingredients.map(ingredient => ({ value: ingredient.id, label: ingredient.name })));
+    } catch (e) {
+      error();
+    }
+  }
+
   return (
-    <div className="recipe-form-container">
+    <div className="form-container">
       <h1 className="form-title">Create Recipe</h1>
       <Formik
         validationSchema={validationSchema}
@@ -87,7 +146,6 @@ function RecipeForm({ values }) {
               idToken: idToken,
               ...values,
             };
-            console.log(body);
 
             const response = await fetch("http://localhost:8080/recipes/", {
               method: "POST",
@@ -123,14 +181,14 @@ function RecipeForm({ values }) {
           <Form>
             <div className="form-section">
               <h2 className="form-subheading">Recipe Details</h2>
-              <div className="fields-grid">
+              <div className="fields-grid" style={{ gridTemplateColumns: "1fr" }}>
+                <Field
+                  className="form-input"
+                  name="name"
+                  placeholder="Recipe Name"
+                  type="text"
+                />
                 <div>
-                  <Field
-                    className="form-input"
-                    name="name"
-                    placeholder="Recipe Name"
-                    type="text"
-                  />
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -140,54 +198,56 @@ function RecipeForm({ values }) {
               </div>
 
               <h3 className="form-subheading">Overview</h3>
-              <div>
+              <div class="fields-grid">
                 <Field
                   as="textarea"
                   name="description"
                   placeholder="Describe your recipe"
                   className="form-textarea"
                 />
-                <ErrorMessage
-                  name="description"
-                  component="div"
-                  className="field-error"
-                />
+                <div>
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="field-error"
+                  />
+                </div>
               </div>
 
-              <div className="fields-grid">
+              <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
+                <Field
+                  className="form-input"
+                  name="prepTime"
+                  placeholder="Prep Time (mins)"
+                  type="text"
+                />
                 <div>
-                  <Field
-                    className="form-input"
-                    name="prepTime"
-                    placeholder="Preparation Time (mins)"
-                    type="text"
-                  />
                   <ErrorMessage
                     name="prepTime"
                     component="div"
                     className="field-error"
                   />
                 </div>
+                <Field
+                  className="form-input"
+                  name="cookTime"
+                  placeholder="Cook Time (mins)"
+                  type="text"
+                />
                 <div>
-                  <Field
-                    className="form-input"
-                    name="cookTime"
-                    placeholder="Cook Time (mins)"
-                    type="text"
-                  />
                   <ErrorMessage
                     name="cookTime"
                     component="div"
                     className="field-error"
                   />
                 </div>
+                <Field
+                  className="form-input"
+                  name="servings"
+                  placeholder="Servings"
+                  type="text"
+                />
                 <div>
-                  <Field
-                    className="form-input"
-                    name="servings"
-                    placeholder="Servings"
-                    type="text"
-                  />
                   <ErrorMessage
                     name="servings"
                     component="div"
@@ -199,96 +259,94 @@ function RecipeForm({ values }) {
 
             <div className="form-section">
               <h2 className="form-subheading">Origin</h2>
-              <Field
-                as="select"
-                name="countries"
-                multiple
-                className="form-select country-select"
-                onChange={(event) => {
-                  const options = event.target.options;
-                  const selectedValues = [];
-                  for (let i = 0; i < options.length; i++) {
-                    if (options[i].selected) {
-                      selectedValues.push(options[i].value);
+              <div class="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
+                <Field
+                  as="select"
+                  name="countries"
+                  multiple
+                  className="form-select country-select"
+                  onChange={(event) => {
+                    const options = event.target.options;
+                    const selectedValues = [];
+                    for (let i = 0; i < options.length; i++) {
+                      if (options[i].selected) {
+                        selectedValues.push(options[i].value);
+                      }
                     }
-                  }
-                  setFieldValue("countries", selectedValues);
-                }}
-              >
-                {Object.entries(countries).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {value}
-                  </option>
-                ))}
-              </Field>
-              <ErrorMessage
-                name="countries"
-                component="div"
-                className="field-error"
-              />
+                    setFieldValue("countries", selectedValues);
+                  }}
+                >
+                  {Object.entries(countries).map(([key, value]) => (
+                    <option key={key} value={key}>
+                      {value}
+                    </option>
+                  ))}
+                </Field>
+                <div>
+                  <ErrorMessage
+                    name="countries"
+                    component="div"
+                    className="field-error"
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="form-section">
               <FieldArray name="ingredients">
-                {({ remove, push }) => (
+                {({ remove, push }) => {
+                  async function addIngredient(option) {
+                    setSelectedIngredient(null);
+
+                    // Check if ingredient already included
+                    for (let ingredient of values.ingredients) {
+                      if (ingredient.id === option.value) {
+                        toast.warn("Ingredient is already added", {
+                          position: "top-right",
+                          autoClose: 3000,
+                        });
+
+                        return;
+                      }
+                    }
+
+                    var newIngredient = {
+                      id: option.value,
+                      name: option.label,
+                      quantity: "",
+                      quantityUnit: "",
+                    };
+                
+                    push(newIngredient);  
+                  }
+
+                  return (
                   <div>
                     <h2 className="form-subheading">Ingredients</h2>
+                    <Async loadOptions={searchIngredient} onChange={addIngredient} value={selectedIngredient} styles={{
+                      option: (provided, state) => ({
+                        ...provided,
+                        color: "black"
+                      })
+                    }}/>
                     {values.ingredients.length > 0 &&
                       values.ingredients.map((ingredient, index) => (
-                        <div key={index} className="ingredient-row">
-                          <div>
+                        <div key={index}>
+                          <p>{ ingredient.name }</p>
+                          <div className="fields-grid" style={{ gridTemplateColumns: "90px 190px min-content" }}>
                             <Field
                               className="form-input"
-                              name={`ingredients.${index}.id`}
-                              placeholder="ID"
+                              name={`ingredients.${index}.quantity`}
+                              placeholder="Quantity"
                               type="text"
                             />
-                            <ErrorMessage
-                              name={`ingredients.${index}.id`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.name`}
-                              placeholder="Name"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.name`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.quantity.numerator`}
-                              placeholder="Numerator"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantity.numerator`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.quantity.denominator`}
-                              placeholder="Denominator"
-                              type="text"
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantity.denominator`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
-                          <div>
+                            <div>
+                              <ErrorMessage
+                                name={`ingredients.${index}.quantity`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
                             <Field
                               as="select"
                               className="form-select"
@@ -301,37 +359,25 @@ function RecipeForm({ values }) {
                                 </option>
                               ))}
                             </Field>
-                            <ErrorMessage
-                              name={`ingredients.${index}.quantityUnit`}
-                              component="div"
-                              className="field-error"
-                            />
+                            <div>
+                              <ErrorMessage
+                                name={`ingredients.${index}.quantityUnit`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <button
+                              className="remove-button"
+                              type="button"
+                              onClick={() => remove(index)}
+                            >
+                              Remove
+                            </button>
                           </div>
-                          <button
-                            className="remove-button"
-                            type="button"
-                            onClick={() => remove(index)}
-                          >
-                            Remove
-                          </button>
                         </div>
                       ))}
-                    <button
-                      className="add-button"
-                      type="button"
-                      onClick={() =>
-                        push({
-                          id: "",
-                          name: "",
-                          quantity: { numerator: "", denominator: "" },
-                          quantityUnit: "",
-                        })
-                      }
-                    >
-                      Add Ingredient
-                    </button>
                   </div>
-                )}
+                )}}
               </FieldArray>
             </div>
 
@@ -349,13 +395,20 @@ function RecipeForm({ values }) {
                           >
                             Step {index + 1}
                           </label>
-                          <div style={{ display: "flex", gap: "10px" }}>
+                          <div class="fields-grid" style={{ gridTemplateColumns: "500px min-content" }}>
                             <Field
                               as="textarea"
                               className="form-textarea"
                               name={`directions.${index}`}
                               placeholder="Describe the step"
                             />
+                            <div>
+                              <ErrorMessage
+                                name={`directions.${index}`}
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
                             <button
                               className="remove-button"
                               type="button"
@@ -365,11 +418,6 @@ function RecipeForm({ values }) {
                               Remove
                             </button>
                           </div>
-                          <ErrorMessage
-                            name={`directions.${index}`}
-                            component="div"
-                            className="field-error"
-                          />
                         </div>
                       ))}
                     <button
@@ -391,12 +439,14 @@ function RecipeForm({ values }) {
 
             <div className="form-section">
               <h2 className="form-subheading">Notes</h2>
-              <Field
-                as="textarea"
-                name="notes"
-                placeholder="Optional notes about the recipe"
-                className="form-textarea"
-              />
+              <div class="fields-grid">
+                <Field
+                  as="textarea"
+                  name="notes"
+                  placeholder="Notes"
+                  className="form-textarea"
+                />
+              </div>
             </div>
 
             <button

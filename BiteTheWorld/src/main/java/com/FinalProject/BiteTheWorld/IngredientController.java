@@ -1,5 +1,8 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -65,6 +68,7 @@ public class IngredientController {
                 return ResponseEntity.internalServerError().build();
             }
 
+            contentSystem.ingredients.put(id, ingredient);
             return ResponseEntity.ok(id);
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(401).body("Failed to authenticate user");
@@ -73,7 +77,17 @@ public class IngredientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable String id) {
-        boolean deleted = contentSystem.deleteById("ingredients", id);
-        return deleted ? ResponseEntity.ok().build() : ResponseEntity.notFound().build();
+        if (contentSystem.deleteById("ingredients", id)) {
+            contentSystem.ingredients.remove(id);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/lookup")
+    public ResponseEntity<List<Ingredient>> lookupIngredientsByName(@RequestBody SearchContext name) {
+        List<Ingredient> results = contentSystem.lookupIngredientsByName(name.query, 5);
+        return ResponseEntity.ok(results);
     }
 }

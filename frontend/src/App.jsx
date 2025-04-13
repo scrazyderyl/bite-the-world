@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router'
+import { Routes, Route, useNavigate } from 'react-router'
 import { auth } from "./firebaseConfig";
 
 import Navbar from './Navbar';

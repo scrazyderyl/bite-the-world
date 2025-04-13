@@ -12,7 +12,6 @@ class IngredientSubmission {
 
     public String image;
 
-    @NotBlank
     public String description;
 
     public IngredientSubmission() {
