@@ -1,6 +1,7 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -8,6 +9,7 @@ import java.util.concurrent.ExecutionException;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
@@ -57,6 +59,28 @@ class ContentSystem {
 
     public static ContentSystem getInstance() {
         return instance;
+    }
+
+    public Recipe getRecipeByIngredient(String[] ingredients) {
+        try {
+            CollectionReference doc = db.collection("recipes");
+            List<Recipe> recipeList = doc.whereArrayContainsAny("ingredients", Arrays.asList(ingredients)).get().get().toObjects(Recipe.class);
+            for (String ingredient : ingredients) {
+                for (Recipe recipe : recipeList) {
+                    if(recipeList.size() == 1) {
+                        return recipeList.get(0);
+                    }
+                    if (!recipe.containsIngredient(ingredient)) {
+                        recipeList.remove(recipe);
+                    }
+                }
+            }
+            return recipeList.get(0); // Return the first recipe that matches all ingredients
+            //return doc.toObject(Recipe.class);
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Error fetching recipe: " + e.getMessage());
+            return null;
+        }
     }
 
     public <T> String submit(String collection, T document) {

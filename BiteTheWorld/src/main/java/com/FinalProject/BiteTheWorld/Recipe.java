@@ -58,6 +58,15 @@ class Recipe {
         return id;
     }
 
+    public boolean containsIngredient(String ingredientToCheck) {
+        for (IngredientWithQuantity ingredient : ingredients) {
+            if (ingredient.name.equals(ingredientToCheck)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public RecipeOverview toListing() {
         String thumbnail = images.isEmpty() ? null : images.get(0);
 
