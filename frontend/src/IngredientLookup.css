@@ -1,0 +1,14 @@
+.ingredient-entry {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.ingredient-name {
+  color: black;
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 20px;
+}
