@@ -5,7 +5,7 @@ import * as Yup from "yup";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { units } from "./constants/units";
-import "./RecipeForm.css";
+import "./Form.css";
 import Select from "react-select";
 
 function getDefaultValues() {
