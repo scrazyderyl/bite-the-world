@@ -73,13 +73,13 @@ function IngredientForm({ values }) {
             <div className="form-section">
               <h2 className="form-subheading">Ingredient Details</h2>
               <div className="fields-grid">
+                <Field
+                  className="form-input"
+                  name="name"
+                  placeholder="Ingredient Name"
+                  type="text"
+                />
                 <div>
-                  <Field
-                    className="form-input"
-                    name="name"
-                    placeholder="Ingredient Name"
-                    type="text"
-                  />
                   <ErrorMessage
                     name="name"
                     component="div"
@@ -87,19 +87,20 @@ function IngredientForm({ values }) {
                   />
                 </div>
               </div>
-              
-              <div>
+              <div className="fields-grid">
                 <Field
                   as="textarea"
                   name="description"
                   placeholder="Describe your ingredient"
                   className="form-textarea"
                 />
-                <ErrorMessage
-                  name="description"
-                  component="div"
-                  className="field-error"
-                />
+                <div>
+                  <ErrorMessage
+                    name="description"
+                    component="div"
+                    className="field-error"
+                  />
+                </div>
               </div>
             </div>
 

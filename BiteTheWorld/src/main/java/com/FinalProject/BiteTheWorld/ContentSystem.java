@@ -1,7 +1,6 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -46,6 +45,7 @@ class ContentSystem {
             }
             
             List<Ingredient> allIngredients = db.collection("ingredients").get().get().toObjects(Ingredient.class);
+            ingredients = new HashMap<>();
 
             for (Ingredient ingredient : allIngredients) {
                 ingredients.put(ingredient.getId(), ingredient);

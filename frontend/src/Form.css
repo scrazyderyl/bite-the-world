@@ -39,15 +39,17 @@
 
 .fields-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, 1fr);
+  grid-template-rows: max-content 20px;
+  grid-auto-flow: column;
+  column-gap: 16px;
   margin-bottom: 16px;
 }
 
 .form-input,
 .form-select,
 .form-textarea {
-  width: 100%;
+  max-width: 100%;
   padding: 12px;
   border-radius: 6px;
   border: 1px solid #ddd;
