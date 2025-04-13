@@ -1,12 +1,10 @@
-import { React } from "react";
-import { auth } from "./firebaseConfig";
-import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
-import * as Yup from "yup";
+import { React, useState } from "react";
 import { toast } from "react-toastify";
+import Async from 'react-select/async';
+import { Formik, Form, ErrorMessage, FieldArray } from "formik";
+import * as Yup from "yup";
 import "react-toastify/dist/ReactToastify.css";
-import { units } from "./constants/units";
-import "./RecipeForm.css";
-import Select from "react-select";
+import "./Form.css";
 
 function getDefaultValues() {
   return {
@@ -16,15 +14,47 @@ function getDefaultValues() {
 
 const validationSchema = Yup.object({
   ingredients: Yup.array()
-    .of(
-      Yup.object({
-        Ingredient: Yup.string().required("Required"),
-      })
-    )
     .min(1, "At least one ingredient is required"),
 });
 
 export default function IngredientLookup() {
+  const [selectedIngredient, setSelectedIngredient] = useState();
+
+  async function searchIngredient(name, callback) {
+    const error = () => {
+      toast.error("Ingredient lookup failed.", {
+        toastId: "ingredient-lookup-error",
+        position: "top-right",
+        autoClose: 3000,
+      });
+      callback([]);
+    }
+
+    try {
+      const body = {
+        query: name
+      }
+
+      const response = await fetch("http://localhost:8080/ingredients/lookup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        error();
+        return;
+      }
+
+      const ingredients = await response.json();
+      callback(ingredients.map(ingredient => ({ value: ingredient.id, label: ingredient.name })));
+    } catch (e) {
+      error();
+    }
+  }
+
   return (
     <div className="recipe-form-container">
       <h1 className="form-title">Look up Recipe by Ingredient</h1>
@@ -33,10 +63,7 @@ export default function IngredientLookup() {
         initialValues={getDefaultValues()}
         onSubmit={async (values) => {
           try {
-            const idToken = await auth.currentUser.getIdToken();
-            const body = values.ingredients;
-            console.log(body);
-            console.log("submitted");
+            const body = values.ingredients.map(ingredient => ingredient.id);
 
             const response = await fetch(
               "http://localhost:8080/ingredients/getrecipe",
@@ -50,7 +77,7 @@ export default function IngredientLookup() {
             );
 
             if (!response.ok) {
-              toast.error("Failed to submit Ingredients. Please try again.", {
+              toast.error("Failed to fulfill request.", {
                 position: "top-right",
                 autoClose: 3000,
               });
@@ -58,11 +85,7 @@ export default function IngredientLookup() {
             }
 
             const result = await response.text();
-            toast.success("Ingredients submitted successfully!", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-            console.log("Ingreidents ID:", result);
+            console.log("Recipes:", result);
           } catch (error) {
             toast.error("An error occurred. Please try again.", {
               position: "top-right",
@@ -71,36 +94,46 @@ export default function IngredientLookup() {
           }
         }}
       >
-        {({ values, isSubmitting, setFieldValue }) => (
+        {({ values, isSubmitting }) => (
           <Form>
             <div className="form-section">
               <FieldArray name="ingredients">
-                {({ remove, push }) => (
-                  <div>
+                {({ remove, push }) => {
+                  async function addIngredient(option) {
+                    setSelectedIngredient(null);
+
+                    // Check if ingredient already included
+                    for (let ingredient of values.ingredients) {
+                      if (ingredient.id === option.value) {
+                        toast.warn("Ingredient is already added", {
+                          position: "top-right",
+                          autoClose: 3000,
+                        });
+
+                        return;
+                      }
+                    }
+
+                    var newIngredient = {
+                      id: option.value,
+                      name: option.label
+                    };
+                
+                    push(newIngredient);  
+                  }
+
+                  return <div>
                     <h2 className="form-subheading">Ingredients</h2>
+                    <Async loadOptions={searchIngredient} onChange={addIngredient} value={selectedIngredient} styles={{
+                      option: (provided, state) => ({
+                        ...provided,
+                        color: "black"
+                      })
+                    }}/>
                     {values.ingredients.length > 0 &&
                       values.ingredients.map((ingredient, index) => (
-                        <div key={index} className="ingredient-row">
-                          <div>
-                            <Select
-                              className="form-lookup"
-                              name={`ingredients.${index}.Ingredient`}
-                              options={units}
-                              placeholder="Search for a unit"
-                              isSearchable
-                              onChange={(selectedOption) =>
-                                setFieldValue(
-                                  `ingredients.${index}.Ingredient`,
-                                  selectedOption.value
-                                )
-                              }
-                            />
-                            <ErrorMessage
-                              name={`ingredients.${index}.Ingredient`}
-                              component="div"
-                              className="field-error"
-                            />
-                          </div>
+                        <div key={index} className="ingredient-entry">
+                          <p className="ingredient-name">{ ingredient.name }</p>
                           <button
                             className="remove-button"
                             type="button"
@@ -110,20 +143,14 @@ export default function IngredientLookup() {
                           </button>
                         </div>
                       ))}
-                    <button
-                      className="add-button"
-                      type="button"
-                      onClick={() =>
-                        push({
-                          Ingredient: "",
-                        })
-                      }
-                    >
-                      Add Ingredient
-                    </button>
                   </div>
-                )}
+                }}
               </FieldArray>
+              <ErrorMessage
+                name="ingredients"
+                component="div"
+                className="field-error"
+              />
             </div>
 
             <button

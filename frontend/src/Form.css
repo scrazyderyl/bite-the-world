@@ -128,14 +128,6 @@
   cursor: not-allowed;
 }
 
-.ingredient-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr auto;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
 .step-container {
   margin-bottom: 20px;
 }
@@ -145,6 +137,21 @@
   color: #444;
   margin-bottom: 8px;
   display: block;
+}
+
+.ingredient-entry {
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.ingredient-name {
+  color: black;
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 20px;
 }
 
 .country-select {

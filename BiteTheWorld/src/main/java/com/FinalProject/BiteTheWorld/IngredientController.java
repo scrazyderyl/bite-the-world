@@ -1,6 +1,5 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuthException;
 
@@ -45,12 +43,10 @@ public class IngredientController {
     }
 
     @PostMapping("/getrecipe")
-    public ResponseEntity<Recipe> getrecipe(@RequestBody @Valid String[] ingredients) {
+    public ResponseEntity<Recipe> getRecipes(@RequestBody @Valid String[] ingredients) {
         try {
             Recipe recipe = contentSystem.getRecipeByIngredient(ingredients);
-            if (recipe == null) {
-                return ResponseEntity.notFound().build();
-            }
+
             return ResponseEntity.ok(recipe);
         }  catch (Exception e) {
             System.out.println("Erorr: " + e.getMessage());
