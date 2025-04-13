@@ -5,7 +5,7 @@ import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
 
-import "react-toastify/dist/ReactToastify.css";
+import TagInput from "./TagInput";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
 import "./Form.css"; 
@@ -198,7 +198,7 @@ function RecipeForm({ values }) {
               </div>
 
               <h3 className="form-subheading">Overview</h3>
-              <div class="fields-grid">
+              <div className="fields-grid">
                 <Field
                   as="textarea"
                   name="description"
@@ -259,12 +259,13 @@ function RecipeForm({ values }) {
 
             <div className="form-section">
               <h2 className="form-subheading">Origin</h2>
-              <div class="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
+              <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
                 <Field
                   as="select"
                   name="countries"
                   multiple
-                  className="form-select country-select"
+                  className="form-select"
+                  style={{ height: "200px" }}
                   onChange={(event) => {
                     const options = event.target.options;
                     const selectedValues = [];
@@ -395,7 +396,7 @@ function RecipeForm({ values }) {
                           >
                             Step {index + 1}
                           </label>
-                          <div class="fields-grid" style={{ gridTemplateColumns: "500px min-content" }}>
+                          <div className="fields-grid" style={{ gridTemplateColumns: "500px min-content" }}>
                             <Field
                               as="textarea"
                               className="form-textarea"
@@ -439,7 +440,7 @@ function RecipeForm({ values }) {
 
             <div className="form-section">
               <h2 className="form-subheading">Notes</h2>
-              <div class="fields-grid">
+              <div className="fields-grid">
                 <Field
                   as="textarea"
                   name="notes"
@@ -447,6 +448,16 @@ function RecipeForm({ values }) {
                   className="form-textarea"
                 />
               </div>
+              <h2 className="form-subheading">Tags</h2>
+              <FieldArray name="tags">
+                {({ push, remove }) => (
+                  <TagInput
+                    tags={values.tags}
+                    push={push}
+                    remove={remove}
+                  />
+                )}
+              </FieldArray>
             </div>
 
             <button
