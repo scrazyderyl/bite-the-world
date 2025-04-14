@@ -9,8 +9,30 @@ export default function ImageSelector({ images = [], push, remove, insert }) {
   const [showInputBox, setShowInputBox] = useState(false);
   const [imageURL, setImageURL] = useState();
 
-  const isValidImageURL = (url) =>
-    /\.(jpeg|jpg|gif|png|webp|svg)$/i.test(url);
+  const isValidImageURL = (input) => {
+    var url;
+    
+    try {
+      url = new URL(input);
+    } catch (e) {
+      return false;
+    }
+
+    // Check extension
+    var lastDotIndex = url.pathname.lastIndexOf(".");
+
+    if (lastDotIndex == -1) {
+      return false;
+    }
+
+    var extension = url.pathname.slice(lastDotIndex + 1);
+
+    if (extension == "png" || extension == "jpg" || extension == "jpeg" || extension == "gif" || extension == "webp") {
+      return url.protocol == "http:" || url.protocol == "https:";
+    }
+
+    return false;
+  }
 
   const handleAdd = () => {
     if (isValidImageURL(imageURL)) {
