@@ -2,14 +2,18 @@ package com.FinalProject.BiteTheWorld;
 
 import java.util.List;
 
+import org.hibernate.validator.constraints.URL;
+
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 class RecipeSubmission {
+    @NotNull
     public String idToken;
 
     @NotBlank
@@ -24,7 +28,7 @@ class RecipeSubmission {
     @NotBlank
     public String description;
 
-    public List<String> images;
+    public List<@URL String> images;
 
     @Positive
     public int prepTime;
@@ -35,10 +39,10 @@ class RecipeSubmission {
     @Positive
     public int servings;
 
-    @Size(min = 1)
+    @NotEmpty
     public List<IngredientWithQuantity> ingredients;
 
-    @Size(min = 1)
+    @NotEmpty
     public List<String> directions;
 
     public String notes;

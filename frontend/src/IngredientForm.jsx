@@ -20,7 +20,7 @@ const validationSchema = Yup.object({
     .required("Required"),
   image: Yup.string()
     .url(),
-  description: Yup.string()
+  description: Yup.string().required("Required")
 });
 
 function IngredientForm({ values }) {
