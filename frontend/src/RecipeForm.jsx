@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 import TagInput from "./TagInput";
 import ImageSelector from "./ImageSelector";
+import IngredientForm, { getDefaultValues as getIngredientDefaultValues } from "./IngredientForm";
 import { countries } from "./constants/countries";
 import { units } from "./constants/units";
 import "./Form.css"; 
@@ -96,10 +97,20 @@ const validationSchema = Yup.object({
   notes: Yup.string(),
 });
 
-function RecipeForm({ values }) {
+const CreateIngredientOption = {
+  value: "",
+  label: "[ Create new ingredient ]"
+}
+
+function RecipeForm({ values, close }) {
   const [selectedIngredient, setSelectedIngredient] = useState();
+  const [ingredientFormVisible, setIngredientFormVisible] = useState();
 
   async function searchIngredient(name, callback) {
+    if (name === "") {
+      return [ CreateIngredientOption ];
+    }
+
     const error = () => {
       toast.error("Ingredient lookup failed.", {
         toastId: "ingredient-lookup-error",
@@ -128,375 +139,391 @@ function RecipeForm({ values }) {
       }
 
       const ingredients = await response.json();
-      callback(ingredients.map(ingredient => ({ value: ingredient.id, label: ingredient.name })));
+      var options = ingredients.map(ingredient => ({ value: ingredient.id, label: ingredient.name }));
+      options.push(CreateIngredientOption); // Special options for creating new ingredient
+
+      callback(options);
+      close();
     } catch (e) {
       error();
     }
   }
 
   return (
-    <div className="form-container">
-      <h1 className="form-title">Create Recipe</h1>
-      <Formik
-        validationSchema={validationSchema}
-        initialValues={values || getDefaultValues()}
-        onSubmit={async (values) => {
-          try {
-            const idToken = await auth.currentUser.getIdToken();
-            const body = {
-              idToken: idToken,
-              ...values,
-            };
+    <>
+      <div className="form-container">
+        <h1 className="form-title">Create Recipe</h1>
+        <Formik
+          validationSchema={validationSchema}
+          initialValues={values || getDefaultValues()}
+          onSubmit={async (values) => {
+            try {
+              const idToken = await auth.currentUser.getIdToken();
+              const body = {
+                idToken: idToken,
+                ...values,
+              };
 
-            const response = await fetch("http://localhost:8080/recipes/", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(body),
-            });
+              const response = await fetch("http://localhost:8080/recipes/", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+              });
 
-            if (!response.ok) {
-              toast.error("Failed to submit recipe. Please try again.", {
+              if (!response.ok) {
+                toast.error("Failed to submit recipe. Please try again.", {
+                  position: "top-right",
+                  autoClose: 3000,
+                });
+                return;
+              }
+
+              const result = await response.text();
+              toast.success("Recipe submitted successfully!", {
                 position: "top-right",
                 autoClose: 3000,
               });
-              return;
+              console.log("Recipe ID:", result);
+            } catch (error) {
+              toast.error("An error occurred. Please try again.", {
+                position: "top-right",
+                autoClose: 3000,
+              });
             }
-
-            const result = await response.text();
-            toast.success("Recipe submitted successfully!", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-            console.log("Recipe ID:", result);
-          } catch (error) {
-            toast.error("An error occurred. Please try again.", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-          }
-        }}
-      >
-        {({ values, isSubmitting, setFieldValue }) => (
-          <Form>
-            <div className="form-section">
-              <h2 className="form-subheading">Recipe Details</h2>
-              <div className="fields-grid" style={{ gridTemplateColumns: "1fr" }}>
-                <Field
-                  className="form-input"
-                  name="name"
-                  placeholder="Recipe Name"
-                  type="text"
-                />
-                <div>
-                  <ErrorMessage
+          }}
+        >
+          {({ values, isSubmitting, setFieldValue }) => (
+            <Form>
+              <div className="form-section">
+                <h2 className="form-subheading">Recipe Details</h2>
+                <div className="fields-grid" style={{ gridTemplateColumns: "1fr" }}>
+                  <Field
+                    className="form-input"
                     name="name"
-                    component="div"
-                    className="field-error"
+                    placeholder="Recipe Name"
+                    type="text"
                   />
-                </div>
-              </div>
-
-              <h3 className="form-subheading">Overview</h3>
-              <div style={{ display: "grid", gridTemplateColumns: "min-content 1fr", columnGap: "50px" }}>
-                <div>
-                  <div className="fields-grid">
-                    <Field
-                      as="textarea"
-                      name="description"
-                      placeholder="Describe your recipe"
-                      className="form-textarea"
+                  <div>
+                    <ErrorMessage
+                      name="name"
+                      component="div"
+                      className="field-error"
                     />
-                    <div>
-                      <ErrorMessage
+                  </div>
+                </div>
+
+                <h3 className="form-subheading">Overview</h3>
+                <div style={{ display: "grid", gridTemplateColumns: "min-content 1fr", columnGap: "50px" }}>
+                  <div>
+                    <div className="fields-grid">
+                      <Field
+                        as="textarea"
                         name="description"
-                        component="div"
-                        className="field-error"
+                        placeholder="Describe your recipe"
+                        className="form-textarea"
                       />
+                      <div>
+                        <ErrorMessage
+                          name="description"
+                          component="div"
+                          className="field-error"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
+                        <Field
+                          className="form-input"
+                          name="prepTime"
+                          placeholder="Prep Time (mins)"
+                          type="text"
+                        />
+                        <div>
+                          <ErrorMessage
+                            name="prepTime"
+                            component="div"
+                            className="field-error"
+                          />
+                        </div>
+                        <Field
+                          className="form-input"
+                          name="cookTime"
+                          placeholder="Cook Time (mins)"
+                          type="text"
+                        />
+                        <div>
+                          <ErrorMessage
+                            name="cookTime"
+                            component="div"
+                            className="field-error"
+                          />
+                        </div>
+                        <Field
+                          className="form-input"
+                          name="servings"
+                          placeholder="Servings"
+                          type="text"
+                        />
+                        <div>
+                          <ErrorMessage
+                            name="servings"
+                            component="div"
+                            className="field-error"
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
 
                   <div>
-                    <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
+                    <p className="label-top">Origin</p>
+                    <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
                       <Field
-                        className="form-input"
-                        name="prepTime"
-                        placeholder="Prep Time (mins)"
-                        type="text"
-                      />
-                      <div>
-                        <ErrorMessage
-                          name="prepTime"
-                          component="div"
-                          className="field-error"
-                        />
-                      </div>
-                      <Field
-                        className="form-input"
-                        name="cookTime"
-                        placeholder="Cook Time (mins)"
-                        type="text"
-                      />
-                      <div>
-                        <ErrorMessage
-                          name="cookTime"
-                          component="div"
-                          className="field-error"
-                        />
-                      </div>
-                      <Field
-                        className="form-input"
-                        name="servings"
-                        placeholder="Servings"
-                        type="text"
-                      />
-                      <div>
-                        <ErrorMessage
-                          name="servings"
-                          component="div"
-                          className="field-error"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="label-top">Origin</p>
-                  <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
-                    <Field
-                      as="select"
-                      name="countries"
-                      multiple
-                      className="form-select"
-                      style={{ height: "200px" }}
-                      onChange={(event) => {
-                        const options = event.target.options;
-                        const selectedValues = [];
-                        for (let i = 0; i < options.length; i++) {
-                          if (options[i].selected) {
-                            selectedValues.push(options[i].value);
-                          }
-                        }
-                        setFieldValue("countries", selectedValues);
-                      }}
-                    >
-                      {Object.entries(countries).map(([key, value]) => (
-                        <option key={key} value={key}>
-                          {value}
-                        </option>
-                      ))}
-                    </Field>
-                    <div>
-                      <ErrorMessage
+                        as="select"
                         name="countries"
-                        component="div"
-                        className="field-error"
-                      />
+                        multiple
+                        className="form-select"
+                        style={{ height: "200px" }}
+                        onChange={(event) => {
+                          const options = event.target.options;
+                          const selectedValues = [];
+                          for (let i = 0; i < options.length; i++) {
+                            if (options[i].selected) {
+                              selectedValues.push(options[i].value);
+                            }
+                          }
+                          setFieldValue("countries", selectedValues);
+                        }}
+                      >
+                        {Object.entries(countries).map(([key, value]) => (
+                          <option key={key} value={key}>
+                            {value}
+                          </option>
+                        ))}
+                      </Field>
+                      <div>
+                        <ErrorMessage
+                          name="countries"
+                          component="div"
+                          className="field-error"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="form-section">
-              <h2 className="form-subheading">Images</h2>
-              <FieldArray name="images">
-                {({ push, remove, insert }) => (
-                  <ImageSelector
-                    images={values.images}
-                    push={push}
-                    remove={remove}
-                    insert={insert}
-                  />
-                )}
-              </FieldArray>
-            </div>
+              <div className="form-section">
+                <h2 className="form-subheading">Images</h2>
+                <FieldArray name="images">
+                  {({ push, remove, insert }) => (
+                    <ImageSelector
+                      images={values.images}
+                      push={push}
+                      remove={remove}
+                      insert={insert}
+                    />
+                  )}
+                </FieldArray>
+              </div>
 
-            <div className="form-section">
-              <h2 className="form-subheading">Ingredients</h2>
-              <FieldArray name="ingredients">
-                {({ remove, push }) => {
-                  async function addIngredient(option) {
-                    setSelectedIngredient(null);
+              <div className="form-section">
+                <h2 className="form-subheading">Ingredients</h2>
+                <FieldArray name="ingredients">
+                  {({ remove, push }) => {
+                    async function addIngredient(option) {
+                      setSelectedIngredient(null);
 
-                    // Check if ingredient already included
-                    for (let ingredient of values.ingredients) {
-                      if (ingredient.id === option.value) {
-                        toast.warn("Ingredient is already added", {
-                          position: "top-right",
-                          autoClose: 3000,
-                        });
-
+                      // Check if selected is create ingredient
+                      if (option === CreateIngredientOption) {
+                        setIngredientFormVisible(true);
                         return;
                       }
+
+                      // Check if ingredient already included
+                      for (let ingredient of values.ingredients) {
+                        if (ingredient.id === option.value) {
+                          toast.warn("Ingredient is already added", {
+                            position: "top-right",
+                            autoClose: 3000,
+                          });
+
+                          return;
+                        }
+                      }
+
+                      var newIngredient = {
+                        id: option.value,
+                        name: option.label,
+                        quantity: "",
+                        quantityUnit: "",
+                      };
+                  
+                      push(newIngredient);  
                     }
 
-                    var newIngredient = {
-                      id: option.value,
-                      name: option.label,
-                      quantity: "",
-                      quantityUnit: "",
-                    };
-                
-                    push(newIngredient);  
-                  }
-
-                  return (
-                  <div>
-                    <Async loadOptions={searchIngredient} onChange={addIngredient} value={selectedIngredient} styles={{
-                      option: (provided, state) => ({
-                        ...provided,
-                        color: "black"
-                      })
-                    }}/>
-                    {values.ingredients.length > 0 &&
-                      values.ingredients.map((ingredient, index) => (
-                        <div key={index}>
-                          <p>{ ingredient.name }</p>
-                          <div className="fields-grid" style={{ gridTemplateColumns: "90px 190px min-content" }}>
-                            <Field
-                              className="form-input"
-                              name={`ingredients.${index}.quantity`}
-                              placeholder="Quantity"
-                              type="text"
-                            />
-                            <div>
-                              <ErrorMessage
+                    return (
+                    <div>
+                      <Async loadOptions={searchIngredient} defaultOptions={true} onChange={addIngredient} value={selectedIngredient} styles={{
+                        option: (provided, state) => ({
+                          ...provided,
+                          color: "black"
+                        })
+                      }}/>
+                      {values.ingredients.length > 0 &&
+                        values.ingredients.map((ingredient, index) => (
+                          <div key={index}>
+                            <p>{ ingredient.name }</p>
+                            <div className="fields-grid" style={{ gridTemplateColumns: "90px 190px min-content" }}>
+                              <Field
+                                className="form-input"
                                 name={`ingredients.${index}.quantity`}
-                                component="div"
-                                className="field-error"
+                                placeholder="Quantity"
+                                type="text"
                               />
-                            </div>
-                            <Field
-                              as="select"
-                              className="form-select"
-                              name={`ingredients.${index}.quantityUnit`}
-                            >
-                              <option value="" label="Select a unit" hidden />
-                              {units.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                  {option.label}
-                                </option>
-                              ))}
-                            </Field>
-                            <div>
-                              <ErrorMessage
+                              <div>
+                                <ErrorMessage
+                                  name={`ingredients.${index}.quantity`}
+                                  component="div"
+                                  className="field-error"
+                                />
+                              </div>
+                              <Field
+                                as="select"
+                                className="form-select"
                                 name={`ingredients.${index}.quantityUnit`}
-                                component="div"
-                                className="field-error"
-                              />
+                              >
+                                <option value="" label="Select a unit" hidden />
+                                {units.map((option) => (
+                                  <option key={option.value} value={option.value}>
+                                    {option.label}
+                                  </option>
+                                ))}
+                              </Field>
+                              <div>
+                                <ErrorMessage
+                                  name={`ingredients.${index}.quantityUnit`}
+                                  component="div"
+                                  className="field-error"
+                                />
+                              </div>
+                              <button
+                                className="remove-button"
+                                type="button"
+                                onClick={() => remove(index)}
+                              >
+                                Remove
+                              </button>
                             </div>
-                            <button
-                              className="remove-button"
-                              type="button"
-                              onClick={() => remove(index)}
-                            >
-                              Remove
-                            </button>
                           </div>
-                        </div>
-                      ))}
-                  </div>
-                )}}
-              </FieldArray>
-              {/* <ErrorMessage
-                name="ingredients"
-                component="div"
-                className="field-error"
-              /> */}
-            </div>
+                        ))}
+                    </div>
+                  )}}
+                </FieldArray>
+                {/* <ErrorMessage
+                  name="ingredients"
+                  component="div"
+                  className="field-error"
+                /> */}
+              </div>
 
-            <div className="form-section">
-              <FieldArray name="directions">
-                {({ remove, push }) => (
-                  <div>
-                    <h2 className="form-subheading">Directions</h2>
-                    {values.directions.length > 0 &&
-                      values.directions.map((step, index) => (
-                        <div key={index} className="step-container">
-                          <label
-                            htmlFor={`directions.${index}`}
-                            className="step-label"
-                          >
-                            Step {index + 1}
-                          </label>
-                          <div className="fields-grid" style={{ gridTemplateColumns: "500px min-content" }}>
-                            <Field
-                              as="textarea"
-                              className="form-textarea"
-                              name={`directions.${index}`}
-                              placeholder="Describe the step"
-                            />
-                            <div>
-                              <ErrorMessage
+              <div className="form-section">
+                <FieldArray name="directions">
+                  {({ remove, push }) => (
+                    <div>
+                      <h2 className="form-subheading">Directions</h2>
+                      {values.directions.length > 0 &&
+                        values.directions.map((step, index) => (
+                          <div key={index} className="step-container">
+                            <label
+                              htmlFor={`directions.${index}`}
+                              className="step-label"
+                            >
+                              Step {index + 1}
+                            </label>
+                            <div className="fields-grid" style={{ gridTemplateColumns: "500px min-content" }}>
+                              <Field
+                                as="textarea"
+                                className="form-textarea"
                                 name={`directions.${index}`}
-                                component="div"
-                                className="field-error"
+                                placeholder="Describe the step"
                               />
+                              <div>
+                                <ErrorMessage
+                                  name={`directions.${index}`}
+                                  component="div"
+                                  className="field-error"
+                                />
+                              </div>
+                              <button
+                                className="remove-button"
+                                type="button"
+                                onClick={() => remove(index)}
+                                style={{ alignSelf: "flex-start" }}
+                              >
+                                Remove
+                              </button>
                             </div>
-                            <button
-                              className="remove-button"
-                              type="button"
-                              onClick={() => remove(index)}
-                              style={{ alignSelf: "flex-start" }}
-                            >
-                              Remove
-                            </button>
                           </div>
-                        </div>
-                      ))}
-                    <button
-                      className="add-button"
-                      type="button"
-                      onClick={() => push("")}
-                    >
-                      Add Step
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-              <ErrorMessage
-                name="directions"
-                component="div"
-                className="field-error"
-              />
-            </div>
-
-            <div className="form-section">
-              <h2 className="form-subheading">Notes</h2>
-              <div className="fields-grid">
-                <Field
-                  as="textarea"
-                  name="notes"
-                  placeholder="Notes"
-                  className="form-textarea"
+                        ))}
+                      <button
+                        className="add-button"
+                        type="button"
+                        onClick={() => push("")}
+                      >
+                        Add Step
+                      </button>
+                    </div>
+                  )}
+                </FieldArray>
+                <ErrorMessage
+                  name="directions"
+                  component="div"
+                  className="field-error"
                 />
               </div>
-              <h2 className="form-subheading">Tags</h2>
-              <FieldArray name="tags">
-                {({ push, remove }) => (
-                  <TagInput
-                    tags={values.tags}
-                    push={push}
-                    remove={remove}
-                  />
-                )}
-              </FieldArray>
-            </div>
 
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting..." : "Submit Recipe"}
-            </button>
-          </Form>
-        )}
-      </Formik>
-    </div>
+              <div className="form-section">
+                <h2 className="form-subheading">Notes</h2>
+                <div className="fields-grid">
+                  <Field
+                    as="textarea"
+                    name="notes"
+                    placeholder="Notes"
+                    className="form-textarea"
+                  />
+                </div>
+                <h2 className="form-subheading">Tags</h2>
+                <FieldArray name="tags">
+                  {({ push, remove }) => (
+                    <TagInput
+                      tags={values.tags}
+                      push={push}
+                      remove={remove}
+                    />
+                  )}
+                </FieldArray>
+              </div>
+
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit Recipe"}
+              </button>
+            </Form>
+          )}
+        </Formik>
+      </div>
+      <div className="overlay" style={{ display: ingredientFormVisible ? "block" : "none" }}>
+        <div className="overlay-background" onClick={() => setIngredientFormVisible(false)}></div>
+        { ingredientFormVisible && <IngredientForm values={getIngredientDefaultValues()} close={() => setIngredientFormVisible(false)}/> }
+      </div>
+    </>
   );
 }
 
