@@ -23,7 +23,7 @@ const validationSchema = Yup.object({
   description: Yup.string().required("Required")
 });
 
-function IngredientForm({ values }) {
+function IngredientForm({ values, close }) {
   return (
     <div className="form-container">
       <h1 className="form-title">Create Ingredient</h1>
@@ -60,6 +60,7 @@ function IngredientForm({ values }) {
               autoClose: 3000,
             });
             console.log("Ingredient ID:", result);
+            close();
           } catch (error) {
             toast.error("An error occurred. Please try again.", {
               position: "top-right",
@@ -118,4 +119,5 @@ function IngredientForm({ values }) {
   );
 }
 
-export { IngredientForm, getDefaultValues };
+export default IngredientForm;
+export { getDefaultValues };
