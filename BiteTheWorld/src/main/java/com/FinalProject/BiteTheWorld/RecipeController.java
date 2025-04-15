@@ -2,6 +2,7 @@ package com.FinalProject.BiteTheWorld;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,8 +14,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -36,11 +35,10 @@ public class RecipeController {
             if (recipe == null) {
                 return ResponseEntity.notFound().build();
             }
-            recipe.views++;
-            contentSystem.updateRecipeViews(id, recipe.views);
+            
             ObjectMapper mapper = new ObjectMapper();
             ObjectWriter writer;
-
+            
             // If user is not logged in
             if (idToken.idToken == null) {
                 writer = mapper.writer().withAttribute("uid", null);
@@ -51,10 +49,11 @@ public class RecipeController {
             }
 
             String serializedRecipe = writer.writeValueAsString(recipe);
+            contentSystem.updateRecipeViews(id, recipe.views);
 
             return ResponseEntity.ok(serializedRecipe);
         } catch (Exception e) {
-            System.out.println("Erorr: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -6,6 +6,6 @@ class Preferences {
     public HashMap<String, Object> preferences;
 
     public Preferences() {
-
+        preferences = new HashMap<>();
     }
 }
