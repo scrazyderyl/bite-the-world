@@ -21,6 +21,8 @@ class Account {
 
     public Account(AccountType type) {
         this.type = type;
+        this.history = new History();
+        this.preferences = new Preferences(); 
     }
 
     public String getId() {
