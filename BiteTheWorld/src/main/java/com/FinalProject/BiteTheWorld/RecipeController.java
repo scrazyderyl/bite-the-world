@@ -61,6 +61,7 @@ public class RecipeController {
     @PostMapping(value = "/")
     public ResponseEntity<String> submit(@RequestBody @Valid RecipeSubmission submission) {
         try {
+            System.out.println("Submitting recipe: " + submission.name);
             Recipe recipe = submission.toRecipe();
             String id = contentSystem.submit("recipes", recipe);
 

@@ -6,6 +6,7 @@ import * as Yup from "yup";
 
 import "./Form.css";
 import "./IngredientLookup.css";
+import RecipeCard from './RecipeCard';
 
 function getDefaultValues() {
   return {
@@ -20,6 +21,7 @@ const validationSchema = Yup.object({
 
 export default function IngredientLookup() {
   const [selectedIngredient, setSelectedIngredient] = useState();
+  const [recipeInfo, setRecipeInfo] = useState(null);
 
   async function searchIngredient(name, callback) {
     const error = () => {
@@ -57,6 +59,7 @@ export default function IngredientLookup() {
   }
 
   return (
+    <>
     <div className="recipe-form-container">
       <h1 className="form-title">Look up Recipe by Ingredient</h1>
       <Formik
@@ -64,7 +67,8 @@ export default function IngredientLookup() {
         initialValues={getDefaultValues()}
         onSubmit={async (values) => {
           try {
-            const body = values.ingredients.map(ingredient => ingredient.id);
+            setRecipeInfo(null);
+            const body = values.ingredients.map(ingredient => ingredient.name);
 
             const response = await fetch(
               "http://localhost:8080/ingredients/getrecipe",
@@ -78,15 +82,24 @@ export default function IngredientLookup() {
             );
 
             if (!response.ok) {
-              toast.error("Failed to fulfill request.", {
+              console.error("Error fetching recipe:", response.status);
+                toast.error("No recipes found for the given ingredients.", {
+                  position: "top-right",
+                  autoClose: 3000,
+                });
+              }
+            else {
+              const data = await response.json();
+              toast.success("Fulfilled request successfully.", {
                 position: "top-right",
                 autoClose: 3000,
               });
-              return;
+              setRecipeInfo(data);
+              console.log("Recipe id:", data.id);
             }
 
-            const result = await response.text();
-            console.log("Recipes:", result);
+            //const result = await response.text();
+            //console.log("Recipes:", result);
           } catch (error) {
             toast.error("An error occurred. Please try again.", {
               position: "top-right",
@@ -165,6 +178,10 @@ export default function IngredientLookup() {
         )}
       </Formik>
     </div>
+    <div className="recipe-card-container">
+      {recipeInfo && <RecipeCard key={recipeInfo.id} recipe={recipeInfo}/> }
+    </div>
+    </>
   );
 }
 

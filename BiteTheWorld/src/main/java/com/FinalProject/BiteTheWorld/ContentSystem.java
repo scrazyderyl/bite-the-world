@@ -64,7 +64,10 @@ class ContentSystem {
     public Recipe getRecipeByIngredient(String[] ingredients) {
         try {
             CollectionReference doc = db.collection("recipes");
-            List<Recipe> recipeList = doc.whereArrayContainsAny("ingredients", Arrays.asList(ingredients)).get().get().toObjects(Recipe.class);
+            List<Recipe> recipeList = doc.whereArrayContainsAny("ingredientsstrings", Arrays.asList(ingredients)).get().get().toObjects(Recipe.class);
+            if(recipeList.get(0) == null) {
+                return null; // No recipes found with the given ingredients
+            }
             for (String ingredient : ingredients) {
                 for (Recipe recipe : recipeList) {
                     if(recipeList.size() == 1) {
