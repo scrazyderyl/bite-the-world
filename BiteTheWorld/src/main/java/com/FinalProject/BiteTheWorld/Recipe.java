@@ -1,5 +1,6 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,13 +26,14 @@ class Recipe {
     public String notes;
     public HashMap<String, Comment> comments;
     public long views;
+    public List<String> ingredientsstrings;
 
     @JsonSerialize(using = RatingsSerializer.class)
     public Ratings ratings;
     
     public Recipe(String name, String authorId, List<String> tags, List<Country> countries, String description, List<String> images,
             int prepTime, int cookTime, int servings, List<IngredientWithQuantity> ingredients, List<String> directions,
-            String notes) {
+            String notes, List<String> ingredientsstrings) {
         this.name = name;
         this.authorId = authorId;
         this.lastUpdated = new Date();
@@ -48,6 +50,7 @@ class Recipe {
         this.comments = new HashMap<>();
         this.views = 0;
         this.ratings = new Ratings();
+        this.ingredientsstrings = ingredientsstrings;
     }
 
     public Recipe() {
