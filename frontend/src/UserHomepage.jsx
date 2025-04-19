@@ -14,14 +14,13 @@ const UserHomePage = ({ user }) => {
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
+  
+  // Redirect to login page if not logged in
+  if (!user) {
+    navigate("/login");
+  }
 
   useEffect(() => {
-    // Redirect to login page if not logged in
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
     // published recipes
     fetch("/recipes.json")
       .then(res => res.json())
@@ -39,10 +38,6 @@ const UserHomePage = ({ user }) => {
       setBookmarkedRecipes(JSON.parse(savedBookmarks));
     }
   }, []);
-
-  if (!user) {
-    return;
-  }
 
   // drafts to localStorage whenever they change
   useEffect(() => {
@@ -113,16 +108,10 @@ const UserHomePage = ({ user }) => {
     <div className="user-homepage">
       <div className="header">
         <h2>Welcome to Bite the World, {user.displayName}!</h2>
-        <button 
-          className="create-recipe-btn"
-          onClick={handleCreateDraft}
-        >
-          Create New Recipe
-        </button>
       </div>
 
       {/* Tab Navigation */}
-      <div className="tab-navigation">
+      <div className="tab-navigation" style={styles.tabNavigation}>
         <button 
           className={`tab-btn ${activeTab === 'myRecipes' ? 'active' : ''}`}
           onClick={() => setActiveTab('myRecipes')}
@@ -266,26 +255,16 @@ const UserHomePage = ({ user }) => {
           )}
         </div>
       )}
-
-      {/* Recipe Form Modal */}
-      {showDraftModal && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <button className="close-modal" onClick={() => {
-              setShowDraftModal(false);
-              setEditingDraft(null);
-            }}>×</button>
-            
-            <h2>{editingDraft?.name ? `Edit Recipe: ${editingDraft.name}` : 'Create New Recipe'}</h2>
-
-            <div className="form-container">
-              <RecipeForm values={editingDraft}/>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
+
+const styles = {
+  tabNavigation: {
+    display: "grid",
+    gridTemplateColumns: "max-content max-content max-content",
+    columnGap: "12px"
+  }
+}
 
 export default UserHomePage;

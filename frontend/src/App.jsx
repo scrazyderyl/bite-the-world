@@ -13,6 +13,7 @@ import Recipe from './Recipe';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
+import RecipeEditor from './RecipeEditor';
 
 function App() {
   const navigate = useNavigate();
@@ -70,6 +71,12 @@ function App() {
               <Login onLogin={updateUser} />
             </div>
           } />
+          <Route path="/recipes/new" element={
+            <div style={styles.pagePadding}>
+              <RecipeEditor user={user}/>
+            </div>
+          }
+          />
           <Route path="/country/:country_code" element={
             <div style={styles.pagePadding}>
               <Country />
@@ -90,9 +97,10 @@ function App() {
 const styles = {
   page: {
     position: 'absolute',
-    paddingTop: '65.59px',
+    top: '66px',
     width: '100%',
-    height: 'calc(100% - 65.59px)',
+    height: 'calc(100% - 66px)',
+    overflow: 'auto'
   },
   pagePadding: {
     paddingTop: '20px',

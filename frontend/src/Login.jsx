@@ -24,7 +24,7 @@ function Login({ onLogin }) {
   return (
     <>
       <div style={styles.container}>
-        <h2>Login</h2>
+        <h2 style={styles.title}>Login</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
@@ -67,6 +67,9 @@ const styles = {
   form: {
     display: "flex",
     flexDirection: "column",
+  },
+  title: {
+    color: "#333"
   },
   input: {
     marginBottom: "10px",
