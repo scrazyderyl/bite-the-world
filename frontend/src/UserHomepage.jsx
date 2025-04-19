@@ -14,13 +14,13 @@ const UserHomePage = ({ user }) => {
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
+  
+  // Redirect to login page if not logged in
+  if (!user) {
+    navigate("/login");
+  }
 
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
-
     // published recipes
     fetch("/recipes.json")
       .then(res => res.json())
@@ -38,10 +38,6 @@ const UserHomePage = ({ user }) => {
       setBookmarkedRecipes(JSON.parse(savedBookmarks));
     }
   }, []);
-
-  if (!user) {
-    return;
-  }
 
   // drafts to localStorage whenever they change
   useEffect(() => {
@@ -73,18 +69,12 @@ const UserHomePage = ({ user }) => {
     setShowDraftModal(false);
     setEditingDraft(null);
     
-    toast.success("Draft saved successfully!", {
-      position: "top-right",
-      autoClose: 3000,
-    });
+    toast.success("Draft saved successfully!");
   };
 
   const handleDeleteDraft = (draftId) => {
     setDrafts(drafts.filter(d => d.id !== draftId));
-    toast.info("Draft deleted", {
-      position: "top-right",
-      autoClose: 3000,
-    });
+    toast.info("Draft deleted");
   };
 
   const handlePublishDraft = (draft) => {
@@ -99,44 +89,29 @@ const UserHomePage = ({ user }) => {
     setRecipes([...recipes, newRecipe]);
     setDrafts(drafts.filter(d => d.id !== draft.id));
     
-    toast.success("Recipe published successfully!", {
-      position: "top-right",
-      autoClose: 3000,
-    });
+    toast.success("Recipe published successfully!");
   };
 
   const handleBookmarkRecipe = (recipe) => {
     if (!bookmarkedRecipes.some(r => r.id === recipe.id)) {
       setBookmarkedRecipes([...bookmarkedRecipes, recipe]);
-      toast.success("Recipe bookmarked!", {
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.success("Recipe bookmarked!");
     }
   };
 
   const handleRemoveBookmark = (recipeId) => {
     setBookmarkedRecipes(bookmarkedRecipes.filter(r => r.id !== recipeId));
-    toast.info("Bookmark removed", {
-      position: "top-right",
-      autoClose: 3000,
-    });
+    toast.info("Bookmark removed");
   };
 
   return (
     <div className="user-homepage">
       <div className="header">
         <h2>Welcome to Bite the World, {user.displayName}!</h2>
-        <button 
-          className="create-recipe-btn"
-          onClick={handleCreateDraft}
-        >
-          Create New Recipe
-        </button>
       </div>
 
       {/* Tab Navigation */}
-      <div className="tab-navigation">
+      <div className="tab-navigation" style={styles.tabNavigation}>
         <button 
           className={`tab-btn ${activeTab === 'myRecipes' ? 'active' : ''}`}
           onClick={() => setActiveTab('myRecipes')}
@@ -280,410 +255,16 @@ const UserHomePage = ({ user }) => {
           )}
         </div>
       )}
-
-      {/* Recipe Form Modal */}
-      {showDraftModal && (
-        <div className="modal-backdrop">
-          <div className="modal-content">
-            <button className="close-modal" onClick={() => {
-              setShowDraftModal(false);
-              setEditingDraft(null);
-            }}>×</button>
-            
-            <h2>{editingDraft?.name ? `Edit Recipe: ${editingDraft.name}` : 'Create New Recipe'}</h2>
-
-            <RecipeForm values={editingDraft}/>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
-// eslint-disable-next-line no-unused-vars
-const additionalStyles = `
-.user-homepage {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  color: #e0e0e0;
-  background-color: #121212;
+const styles = {
+  tabNavigation: {
+    display: "grid",
+    gridTemplateColumns: "max-content max-content max-content",
+    columnGap: "12px"
+  }
 }
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.create-recipe-btn {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.create-recipe-btn:hover {
-  background-color: #66BB6A;
-}
-
-.welcome-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
-  background-color: #1e1e1e;
-  border-radius: 10px;
-  margin-top: 30px;
-}
-
-.welcome-message {
-  text-align: center;
-  max-width: 600px;
-  padding: 30px;
-}
-
-.welcome-message h3 {
-  color: #ffffff;
-  margin-bottom: 20px;
-  font-size: 24px;
-}
-
-.welcome-message p {
-  color: #b0b0b0;
-  margin-bottom: 15px;
-  font-size: 16px;
-}
-
-.tab-navigation {
-  display: flex;
-  border-bottom: 1px solid #333;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  padding: 10px 20px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: #e0e0e0;
-  background-color: #333;
-  margin-right: 5px;
-  border-radius: 5px 5px 0 0;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.tab-btn:hover {
-  background-color: #444;
-  color: #ffffff;
-}
-
-.tab-btn.active {
-  background-color: #2196F3;
-  font-weight: bold;
-  color: white;
-}
-
-.drafts-container {
-  padding: 20px 0;
-}
-
-.drafts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.draft-card {
-  border: 1px solid #333;
-  padding: 15px;
-  border-radius: 5px;
-  background-color: #1e1e1e;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.draft-card h3 {
-  color: #ffffff;
-  margin-bottom: 10px;
-}
-
-.draft-card p {
-  color: #b0b0b0;
-  margin-bottom: 5px;
-}
-
-.draft-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.draft-actions button {
-  padding: 5px 10px;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  color: white;
-  font-weight: bold;
-  transition: opacity 0.3s;
-}
-
-.draft-actions button:nth-child(1) {
-  background-color: #2196F3;
-}
-
-.draft-actions button:nth-child(2) {
-  background-color: #4CAF50;
-}
-
-.draft-actions button:nth-child(3) {
-  background-color: #F44336;
-}
-
-.draft-actions button:hover {
-  opacity: 0.8;
-}
-
-.no-drafts, .no-recipes, .no-bookmarks {
-  text-align: center;
-  color: #757575;
-  padding: 40px 0;
-  font-size: 18px;
-  background-color: #1e1e1e;
-  border-radius: 10px;
-}
-
-.bookmark-btn, .remove-bookmark-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: opacity 0.3s;
-}
-
-.bookmark-btn:hover, .remove-bookmark-btn:hover {
-  opacity: 0.8;
-}
-
-.remove-bookmark-btn {
-  background-color: #F44336;
-}
-
-.recipe-card {
-  position: relative;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 20px;
-  margin-bottom: 20px;
-  background-color: #1e1e1e;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-}
-
-.recipe-card h2 {
-  color: #ffffff;
-  margin-bottom: 15px;
-}
-
-.recipe-card p, .recipe-card h3 {
-  color: #b0b0b0;
-}
-
-.recipe-card ul, .recipe-card ol {
-  color: #b0b0b0;
-  padding-left: 20px;
-}
-
-.recipe-card li {
-  margin-bottom: 5px;
-}
-
-/* Modal Styles */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background-color: #1e1e1e;
-  padding: 20px;
-  border-radius: 5px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-  color: #e0e0e0;
-}
-
-.close-modal {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #b0b0b0;
-}
-
-.close-modal:hover {
-  color: #ffffff;
-}
-
-.recipe-form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
-
-.form-row {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.ingredient-row, .step-row {
-  background-color: #2d2d2d;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  border: 1px solid #333;
-}
-
-.form-group label {
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #ffffff;
-}
-
-.form-group input, 
-.form-group select, 
-.form-group textarea {
-  padding: 8px;
-  border: 1px solid #333;
-  border-radius: 3px;
-  background-color: #2d2d2d;
-  color: #e0e0e0;
-}
-
-.form-group input:focus, 
-.form-group select:focus, 
-.form-group textarea:focus {
-  border-color: #2196F3;
-  outline: none;
-  box-shadow: 0 0 3px rgba(33, 150, 243, 0.5);
-}
-
-.step-group {
-  flex: 3;
-}
-
-.form-group textarea {
-  min-height: 100px;
-  resize: vertical;
-}
-
-.add-btn {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-bottom: 15px;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.add-btn:hover {
-  background-color: #66BB6A;
-}
-
-.remove-btn {
-  background-color: #F44336;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 3px;
-  cursor: pointer;
-  align-self: flex-end;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.remove-btn:hover {
-  background-color: #EF5350;
-}
-
-.form-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.cancel-btn {
-  background-color: #757575;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.cancel-btn:hover {
-  background-color: #9E9E9E;
-}
-
-.save-btn {
-  background-color: #2196F3;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.3s;
-}
-
-.save-btn:hover {
-  background-color: #42A5F5;
-}
-
-.error {
-  color: #EF5350;
-  font-size: 12px;
-  margin-top: 3px;
-}
-`;
 
 export default UserHomePage;

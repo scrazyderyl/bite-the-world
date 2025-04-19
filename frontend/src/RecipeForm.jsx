@@ -1,9 +1,11 @@
-import { React, useState } from "react";
+import { React, useId, useState } from "react";
+import { components } from 'react-select';
 import Async from 'react-select/async';
 import { auth } from "./firebaseConfig";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+import { useOverlay } from "./OverlayContext";
 
 import TagInput from "./TagInput";
 import ImageSelector from "./ImageSelector";
@@ -99,12 +101,14 @@ const validationSchema = Yup.object({
 
 const CreateIngredientOption = {
   value: "",
-  label: "[ Create new ingredient ]"
+  label: "Create new ingredient",
+  italic: true,
 }
 
-function RecipeForm({ values, close }) {
-  const [selectedIngredient, setSelectedIngredient] = useState();
-  const [ingredientFormVisible, setIngredientFormVisible] = useState();
+function RecipeForm({ values, onSuccess }) {
+  const [ selectedIngredient, setSelectedIngredient ] = useState();
+  const { showOverlay, hideOverlay } = useOverlay();
+  const id = useId();
 
   async function searchIngredient(name, callback) {
     if (name === "") {
@@ -112,11 +116,7 @@ function RecipeForm({ values, close }) {
     }
 
     const error = () => {
-      toast.error("Ingredient lookup failed.", {
-        toastId: "ingredient-lookup-error",
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Ingredient lookup failed.");
       callback([]);
     }
 
@@ -143,7 +143,6 @@ function RecipeForm({ values, close }) {
       options.push(CreateIngredientOption); // Special options for creating new ingredient
 
       callback(options);
-      close();
     } catch (e) {
       error();
     }
@@ -151,7 +150,7 @@ function RecipeForm({ values, close }) {
 
   return (
     <>
-      <div className="form-container">
+      <>
         <h1 className="form-title">Create Recipe</h1>
         <Formik
           validationSchema={validationSchema}
@@ -173,24 +172,18 @@ function RecipeForm({ values, close }) {
               });
 
               if (!response.ok) {
-                toast.error("Failed to submit recipe. Please try again.", {
-                  position: "top-right",
-                  autoClose: 3000,
-                });
+                toast.error("Failed to submit recipe. Please try again.");
                 return;
               }
 
               const result = await response.text();
-              toast.success("Recipe submitted successfully!", {
-                position: "top-right",
-                autoClose: 3000,
-              });
-              console.log("Recipe ID:", result);
+              toast.success("Recipe submitted successfully!");
+
+              if (onSuccess) {
+                onSuccess(result);
+              }
             } catch (error) {
-              toast.error("An error occurred. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-              });
+              toast.error("An error occurred. Please try again.");
             }
           }}
         >
@@ -214,72 +207,76 @@ function RecipeForm({ values, close }) {
                   </div>
                 </div>
 
-                <h3 className="form-subheading">Overview</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "min-content 1fr", columnGap: "50px" }}>
+                <div style={{ display: "flex", flexDirection: "row" }}>
                   <div>
-                    <div className="fields-grid">
-                      <Field
-                        as="textarea"
-                        name="description"
-                        placeholder="Describe your recipe"
-                        className="form-textarea"
-                      />
+                    <h3 className="form-subheading">Overview</h3>
+                    <div style={{ display: "grid", gridTemplateColumns: "min-content 1fr", columnGap: "50px" }}>
                       <div>
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="field-error"
-                        />
+                        <div className="fields-grid">
+                          <Field
+                            as="textarea"
+                            name="description"
+                            placeholder="Describe your recipe"
+                            className="form-textarea"
+                          />
+                          <div>
+                            <ErrorMessage
+                              name="description"
+                              component="div"
+                              className="field-error"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
+                            <Field
+                              className="form-input"
+                              name="prepTime"
+                              placeholder="Prep Time (mins)"
+                              type="text"
+                            />
+                            <div>
+                              <ErrorMessage
+                                name="prepTime"
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <Field
+                              className="form-input"
+                              name="cookTime"
+                              placeholder="Cook Time (mins)"
+                              type="text"
+                            />
+                            <div>
+                              <ErrorMessage
+                                name="cookTime"
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                            <Field
+                              className="form-input"
+                              name="servings"
+                              placeholder="Servings"
+                              type="text"
+                            />
+                            <div>
+                              <ErrorMessage
+                                name="servings"
+                                component="div"
+                                className="field-error"
+                              />
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div>
-                      <div className="fields-grid" style={{ gridTemplateColumns: "160px 160px 100px" }}>
-                        <Field
-                          className="form-input"
-                          name="prepTime"
-                          placeholder="Prep Time (mins)"
-                          type="text"
-                        />
-                        <div>
-                          <ErrorMessage
-                            name="prepTime"
-                            component="div"
-                            className="field-error"
-                          />
-                        </div>
-                        <Field
-                          className="form-input"
-                          name="cookTime"
-                          placeholder="Cook Time (mins)"
-                          type="text"
-                        />
-                        <div>
-                          <ErrorMessage
-                            name="cookTime"
-                            component="div"
-                            className="field-error"
-                          />
-                        </div>
-                        <Field
-                          className="form-input"
-                          name="servings"
-                          placeholder="Servings"
-                          type="text"
-                        />
-                        <div>
-                          <ErrorMessage
-                            name="servings"
-                            component="div"
-                            className="field-error"
-                          />
-                        </div>
-                      </div>
-                    </div>
                   </div>
-
                   <div>
-                    <p className="label-top">Origin</p>
+                    <h2 className="form-subheading">Origin</h2>
                     <div className="fields-grid" style={{ gridTemplateColumns: "min-content" }}>
                       <Field
                         as="select"
@@ -334,22 +331,55 @@ function RecipeForm({ values, close }) {
                 <h2 className="form-subheading">Ingredients</h2>
                 <FieldArray name="ingredients">
                   {({ remove, push }) => {
+                    function showIngredientForm() {
+                      showOverlay(id, (
+                        <div className="form-container" style={{ width: "600px"}}>
+                          <button className="close-button" onClick={() => hideOverlay(id)}></button>
+                          <IngredientForm values={getIngredientDefaultValues()} onSuccess={onIngredientCreated}/>
+                        </div>
+                      ));
+                    }
+                  
+                    function onIngredientCreated(newIngredient) {
+                      hideOverlay(id);
+                      setSelectedIngredient(null);
+                      
+                      var recipeIngredient = {
+                        id: newIngredient.id,
+                        name: newIngredient.name,
+                        quantity: "",
+                        quantityUnit: "",
+                      };
+                  
+                      push(recipeIngredient);  
+                    }
+                  
+                    function ItalicOption(props) {
+                      const { data, children } = props;
+                      const isItalic = data.italic;
+                    
+                      return (
+                        <components.Option {...props}>
+                          <span style={{ fontStyle: isItalic ? 'italic' : 'normal' }}>
+                            {children}
+                          </span>
+                        </components.Option>
+                      );
+                    };
+
                     async function addIngredient(option) {
                       setSelectedIngredient(null);
 
                       // Check if selected is create ingredient
-                      if (option === CreateIngredientOption) {
-                        setIngredientFormVisible(true);
+                      if (option.value === "") {
+                        showIngredientForm();
                         return;
                       }
 
                       // Check if ingredient already included
                       for (let ingredient of values.ingredients) {
                         if (ingredient.id === option.value) {
-                          toast.warn("Ingredient is already added", {
-                            position: "top-right",
-                            autoClose: 3000,
-                          });
+                          toast.warn("Ingredient is already added");
 
                           return;
                         }
@@ -367,7 +397,7 @@ function RecipeForm({ values, close }) {
 
                     return (
                     <div>
-                      <Async loadOptions={searchIngredient} defaultOptions={true} onChange={addIngredient} value={selectedIngredient} styles={{
+                      <Async className="form-lookup" loadOptions={searchIngredient} defaultOptions={true} components={{ Option: ItalicOption }} onChange={addIngredient} value={selectedIngredient} styles={{
                         option: (provided, state) => ({
                           ...provided,
                           color: "black"
@@ -375,8 +405,8 @@ function RecipeForm({ values, close }) {
                       }}/>
                       {values.ingredients.length > 0 &&
                         values.ingredients.map((ingredient, index) => (
-                          <div key={index}>
-                            <p>{ ingredient.name }</p>
+                          <div key={index} className="list-item-container">
+                            <p className="list-item-label">{ ingredient.name }</p>
                             <div className="fields-grid" style={{ gridTemplateColumns: "90px 190px min-content" }}>
                               <Field
                                 className="form-input"
@@ -423,11 +453,12 @@ function RecipeForm({ values, close }) {
                     </div>
                   )}}
                 </FieldArray>
-                {/* <ErrorMessage
-                  name="ingredients"
-                  component="div"
-                  className="field-error"
-                /> */}
+                <ErrorMessage name="ingredients">
+                  { msg => typeof msg === 'string' ? (
+                      <div className="field-error">{msg}</div>
+                    ) : null
+                  }
+                </ErrorMessage>
               </div>
 
               <div className="form-section">
@@ -437,10 +468,10 @@ function RecipeForm({ values, close }) {
                       <h2 className="form-subheading">Directions</h2>
                       {values.directions.length > 0 &&
                         values.directions.map((step, index) => (
-                          <div key={index} className="step-container">
+                          <div key={index} className="list-item-container">
                             <label
                               htmlFor={`directions.${index}`}
-                              className="step-label"
+                              className="list-item-label"
                             >
                               Step {index + 1}
                             </label>
@@ -479,11 +510,12 @@ function RecipeForm({ values, close }) {
                     </div>
                   )}
                 </FieldArray>
-                <ErrorMessage
-                  name="directions"
-                  component="div"
-                  className="field-error"
-                />
+                <ErrorMessage name="directions">
+                  { msg => typeof msg === 'string' ? (
+                      <div className="field-error">{msg}</div>
+                    ) : null
+                  }
+                </ErrorMessage>
               </div>
 
               <div className="form-section">
@@ -518,11 +550,7 @@ function RecipeForm({ values, close }) {
             </Form>
           )}
         </Formik>
-      </div>
-      <div className="overlay" style={{ display: ingredientFormVisible ? "block" : "none" }}>
-        <div className="overlay-background" onClick={() => setIngredientFormVisible(false)}></div>
-        { ingredientFormVisible && <IngredientForm values={getIngredientDefaultValues()} close={() => setIngredientFormVisible(false)}/> }
-      </div>
+      </>
     </>
   );
 }
