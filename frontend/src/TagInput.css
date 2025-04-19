@@ -1,0 +1,50 @@
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  background-color: dimgray;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.remove-tag {
+  padding: 0;
+  margin-left: 8px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.tag-input {
+  height: 21px;
+  padding: 4px 8px;
+  font-size: 14px;
+  border: none;
+  border-radius: 8px;
+  background-color: dimgray;
+  outline: none;
+}
+
+.plus-button {
+  width: 29px;
+  height: 29px;
+  background-color: dimgray;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 0;
+  border-radius: 8px;
+}
+
+.plus-button:hover {
+  background-color: #484848;
+}

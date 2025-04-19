@@ -43,7 +43,7 @@ public class CountryController {
             CountryOverview countryPage = new CountryOverview(countryInfo, listings);
             return ResponseEntity.ok(countryPage);
         }  catch (Exception e) {
-            System.out.println("Erorr: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -1,5 +1,7 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -7,20 +9,26 @@ import java.util.concurrent.ExecutionException;
 import org.springframework.stereotype.Service;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.Query.Direction;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
+
+import me.xdrop.fuzzywuzzy.FuzzySearch;
+import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
 
 @Service
 class ContentSystem {
     private static ContentSystem instance;
 
     private final Firestore db;
-    private HashMap<String, CountryInfo> countries;
+
+    // Caches
     private Recipe featuredRecipe;
+    private HashMap<String, CountryInfo> countries;
+    protected HashMap<String, Ingredient> ingredients;
 
     static {
         instance = new ContentSystem();
@@ -28,22 +36,51 @@ class ContentSystem {
     
     private ContentSystem() {
         db = FirebaseConnection.getDatabase();
-        countries = new HashMap<>();
-    
+        
         try {
             ApiFuture<QuerySnapshot> request = db.collection("countries").get();
             List<CountryInfo> countryList = request.get().toObjects(CountryInfo.class);
+            countries = new HashMap<>();
     
             for (CountryInfo country : countryList) {
                 countries.put(country.id, country);
             }
+            
+            List<Ingredient> allIngredients = db.collection("ingredients").get().get().toObjects(Ingredient.class);
+            ingredients = new HashMap<>();
+
+            for (Ingredient ingredient : allIngredients) {
+                ingredients.put(ingredient.getId(), ingredient);
+            }
         } catch (Exception e) {
-            System.out.println("Failed to fetch country info!");
+            System.out.println("Failed to fetch data from Firebase");
         }
     }
 
     public static ContentSystem getInstance() {
         return instance;
+    }
+
+    public Recipe getRecipeByIngredient(String[] ingredients) {
+        try {
+            CollectionReference doc = db.collection("recipes");
+            List<Recipe> recipeList = doc.whereArrayContainsAny("ingredients", Arrays.asList(ingredients)).get().get().toObjects(Recipe.class);
+            for (String ingredient : ingredients) {
+                for (Recipe recipe : recipeList) {
+                    if(recipeList.size() == 1) {
+                        return recipeList.get(0);
+                    }
+                    if (!recipe.containsIngredient(ingredient)) {
+                        recipeList.remove(recipe);
+                    }
+                }
+            }
+            return recipeList.get(0); // Return the first recipe that matches all ingredients
+            //return doc.toObject(Recipe.class);
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Error fetching recipe: " + e.getMessage());
+            return null;
+        }
     }
 
     public <T> String submit(String collection, T document) {
@@ -79,8 +116,20 @@ class ContentSystem {
         db.collection("recipes").document(recipeId).update("views", views);
     }
 
-    public List<Recipe> getRecipesByCountry(String country_code, int count) {
-        ApiFuture<QuerySnapshot> request = db.collection("recipes").whereArrayContains("countries", country_code).limit(count).get();
+    public List<Ingredient> lookupIngredientsByName(String name, int limit) {
+        List<BoundExtractedResult<Ingredient>> results = FuzzySearch.extractTop(name, ingredients.values(), ingredient -> ingredient.name, limit, 70);
+        
+        List<Ingredient> output = new ArrayList<>(results.size());
+
+        for (BoundExtractedResult<Ingredient> ingredient : results) {
+            output.add(ingredient.getReferent());
+        }
+
+        return output;
+    }
+
+    public List<Recipe> getRecipesByCountry(String country_code, int limit) {
+        ApiFuture<QuerySnapshot> request = db.collection("recipes").whereArrayContains("countries", country_code).limit(limit).get();
         
         try {
             return request.get().toObjects(Recipe.class);

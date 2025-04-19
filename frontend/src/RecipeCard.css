@@ -9,6 +9,14 @@
     transform: translateY(-5px);
   }
   
+  .recipe-info-row{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
   .recipe-card {
     border-radius: 12px;
     overflow: hidden;

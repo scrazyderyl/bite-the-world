@@ -2,21 +2,18 @@ package com.FinalProject.BiteTheWorld;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 class IngredientWithQuantity {
-    // @NotNull
-    public int id;
-
     @NotNull
+    public String id;
+
     @NotBlank
     public String name;
 
-    @NotNull
-    public Fraction quantity;
+    @NotBlank
+    public String quantity;
 
-    @NotNull
-    @Size(min = 1)
+    @NotBlank
     public String quantityUnit;
 
     public IngredientWithQuantity() {

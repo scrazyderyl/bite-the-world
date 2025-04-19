@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router'
+import { Routes, Route, useNavigate } from 'react-router'
 import { auth } from "./firebaseConfig";
 
 import Navbar from './Navbar';
@@ -8,6 +8,8 @@ import Signup from './Signup';
 import UserHomepage from './UserHomepage';
 import Country from './Country'
 import Map from './Map'
+import IngredientLookup from './IngredientLookup';
+import Recipe from './Recipe';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
@@ -48,6 +50,11 @@ function App() {
       <div style={styles.page}>
         <Routes>
           <Route path="/" element={<Map />} />
+          <Route path="/ingredients" element={
+            <div style={styles.pagePadding}>
+              <IngredientLookup/>
+            </div>
+          } />
           <Route path="/user" element={
             <div style={styles.pagePadding}>
               <UserHomepage user={user} />
@@ -68,6 +75,12 @@ function App() {
               <Country />
             </div>
           } />
+          <Route path ="/recipes/:recipe_id" element={
+            <div style={styles.pagePadding}>
+              <Recipe/>
+            </div>
+          }
+          />
         </Routes>
       </div>
     </>
