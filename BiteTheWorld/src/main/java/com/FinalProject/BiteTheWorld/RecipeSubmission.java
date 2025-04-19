@@ -51,10 +51,14 @@ class RecipeSubmission {
         
     }
 
+    public List<String> ingredientStrings(List<IngredientWithQuantity> ingredients) {
+        return ingredients.stream().map(ingredient -> ingredient.name).toList();
+    }
+
     public Recipe toRecipe() throws FirebaseAuthException {
         String authorId = AccountSystem.getInstance().getUID(idToken);
 
         return new Recipe(name, authorId, tags, countries, description, images, prepTime, cookTime, servings, ingredients,
-                directions, notes);
+                directions, notes, ingredientStrings(ingredients));
     }
 }

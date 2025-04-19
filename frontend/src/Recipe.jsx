@@ -62,15 +62,19 @@ function Recipe() {
                 <p className="recipe-description">Author: {recipeInfo.authorId} Date: {recipeInfo.lastUpdated} Views: {recipeInfo.views}</p>
                 <p className="recipe-description">Cooking Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
                 <p className="recipe-description">Servings: {recipeInfo.servings}</p>
-                <h3 className="recipe-description">Ingredients: </h3>
                 
-                {/*<ul className="ingredient-list">
-                  {recipeInfo.ingredients.map((ing, i) => (
+                <h3 className = "recipe-description">Ingredients: </h3>
+                <ol className="ingredient-list">
+                  {Array.isArray(recipeInfo.ingredients) ? (
+                    recipeInfo.ingredients.map((ing, i) => (
                     <li key={i} className="ingredient-item">
                       {ing.quantity} {ing.quantityUnit} {ing.name}
                     </li>
-                  ))}
-                </ul>*/}
+                  ))
+                  ) : (
+                    <li>No ingredients available</li>
+                )}
+                </ol>
 
                 <h3 className="recipe-description">Instructions: </h3>
                 <ol>

@@ -46,7 +46,10 @@ public class IngredientController {
     public ResponseEntity<Recipe> getRecipes(@RequestBody @Valid String[] ingredients) {
         try {
             Recipe recipe = contentSystem.getRecipeByIngredient(ingredients);
-
+            if (recipe == null) {
+                System.out.println("No recipe found with the given ingredients.");
+                return ResponseEntity.notFound().build();
+            }
             return ResponseEntity.ok(recipe);
         }  catch (Exception e) {
             System.out.println("Erorr: " + e.getMessage());
