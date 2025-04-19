@@ -51,9 +51,12 @@ function IngredientForm({ values, onSuccess }) {
               return;
             }
 
-            const result = await response.text();
+            const result = await response.json();
             toast.success("Ingredient submitted successfully!");
-            onSuccess(result);
+
+            if (onSuccess) {
+              onSuccess(result);
+            }
           } catch (error) {
             toast.error("An error occurred. Please try again.");
           }

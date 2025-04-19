@@ -71,7 +71,7 @@ public class RecipeController {
 
             return ResponseEntity.ok(id);
         } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(401).body("Failed to authenticate user");
+            return ResponseEntity.status(401).build();
         }
     }
 

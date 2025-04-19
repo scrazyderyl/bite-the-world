@@ -78,6 +78,11 @@
   outline: none;
 }
 
+.form-lookup {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
 .field-error {
   color: #dc3545;
   font-size: 0.85rem;
@@ -85,6 +90,20 @@
 }
 
 /* Buttons */
+.close-button {
+  position: absolute;
+  font-size: 20px;
+  width: 50px;
+  height: 50px;
+  padding: 10px;
+  border-radius: 50%;
+  background-color: #dc3545;
+}
+
+.close-button::before {
+  content: '✖';
+}
+
 .add-button,
 .remove-button,
 .submit-button {
@@ -142,11 +161,11 @@
 }
 
 /* Other */
-.step-container {
+.list-item-container {
   margin-bottom: 20px;
 }
 
-.step-label {
+.list-item-label {
   font-weight: 600;
   color: #444;
   margin-bottom: 8px;

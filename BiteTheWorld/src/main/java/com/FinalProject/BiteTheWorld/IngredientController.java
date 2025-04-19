@@ -1,6 +1,7 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,7 +59,7 @@ public class IngredientController {
     }
 
     @PostMapping(value = "/")
-    public ResponseEntity<String> submit(@RequestBody @Valid IngredientSubmission submission) {
+    public ResponseEntity<Ingredient> submit(@RequestBody @Valid IngredientSubmission submission) {
         try {
             Ingredient ingredient = submission.toIngredient();
             String id = contentSystem.submit("ingredients", ingredient);
@@ -68,9 +69,13 @@ public class IngredientController {
             }
 
             contentSystem.ingredients.put(id, ingredient);
-            return ResponseEntity.ok(id);
+
+            ingredient = contentSystem.getDocument("ingredients", id).toObject(Ingredient.class);
+            return ResponseEntity.ok(ingredient);
         } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(401).body("Failed to authenticate user");
+            return ResponseEntity.status(401).build();
+        } catch (InterruptedException | ExecutionException ex) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 
