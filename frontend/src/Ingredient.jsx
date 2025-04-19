@@ -33,10 +33,7 @@ function Ingredient() {
             const result = await response.json();
             setIngedientInfo(result);
         } catch (error) {
-            toast.error("Failed to view Ingredient. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-            });
+            toast.error("Failed to view Ingredient. Please try again.");
         } finally {
             setLoading(false); // Set loading to false when fetch is done
         }

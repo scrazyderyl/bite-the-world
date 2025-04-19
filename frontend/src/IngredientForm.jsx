@@ -23,9 +23,9 @@ const validationSchema = Yup.object({
   description: Yup.string().required("Required")
 });
 
-function IngredientForm({ values, close }) {
+function IngredientForm({ values, onSuccess }) {
   return (
-    <div className="form-container">
+    <>
       <h1 className="form-title">Create Ingredient</h1>
       <Formik
         validationSchema={validationSchema}
@@ -47,25 +47,15 @@ function IngredientForm({ values, close }) {
             });
 
             if (!response.ok) {
-              toast.error("Failed to submit ingredient. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-              });
+              toast.error("Failed to submit ingredient. Please try again.");
               return;
             }
 
             const result = await response.text();
-            toast.success("Ingredient submitted successfully!", {
-              position: "top-right",
-              autoClose: 3000,
-            });
-            console.log("Ingredient ID:", result);
-            close();
+            toast.success("Ingredient submitted successfully!");
+            onSuccess(result);
           } catch (error) {
-            toast.error("An error occurred. Please try again.", {
-              position: "top-right",
-              autoClose: 3000,
-            });
+            toast.error("An error occurred. Please try again.");
           }
         }}
       >
@@ -115,7 +105,7 @@ function IngredientForm({ values, close }) {
           </Form>
         )}
       </Formik>
-    </div>
+    </>
   );
 }
 

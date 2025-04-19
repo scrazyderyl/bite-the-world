@@ -25,11 +25,7 @@ export default function IngredientLookup() {
 
   async function searchIngredient(name, callback) {
     const error = () => {
-      toast.error("Ingredient lookup failed.", {
-        toastId: "ingredient-lookup-error",
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Ingredient lookup failed.");
       callback([]);
     }
 
@@ -83,17 +79,11 @@ export default function IngredientLookup() {
 
             if (!response.ok) {
               console.error("Error fetching recipe:", response.status);
-                toast.error("No recipes found for the given ingredients.", {
-                  position: "top-right",
-                  autoClose: 3000,
-                });
+                toast.error("No recipes found for the given ingredients.");
               }
             else {
               const data = await response.json();
-              toast.success("Fulfilled request successfully.", {
-                position: "top-right",
-                autoClose: 3000,
-              });
+              toast.success("Fulfilled request successfully.");
               setRecipeInfo(data);
               console.log("Recipe id:", data.id);
             }
@@ -101,10 +91,7 @@ export default function IngredientLookup() {
             //const result = await response.text();
             //console.log("Recipes:", result);
           } catch (error) {
-            toast.error("An error occurred. Please try again.", {
-              position: "top-right",
-              autoClose: 3000,
-            });
+            toast.error("An error occurred. Please try again.");
           }
         }}
       >
@@ -119,10 +106,7 @@ export default function IngredientLookup() {
                     // Check if ingredient already included
                     for (let ingredient of values.ingredients) {
                       if (ingredient.id === option.value) {
-                        toast.warn("Ingredient is already added", {
-                          position: "top-right",
-                          autoClose: 3000,
-                        });
+                        toast.warn("Ingredient is already added");
 
                         return;
                       }

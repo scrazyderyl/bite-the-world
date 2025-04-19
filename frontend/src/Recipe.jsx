@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams } from "react-router";
-import "../Styles/Recipes.css";
 import { auth } from "./firebaseConfig";
 import { toast } from "react-toastify";
+
+import "../Styles/Recipes.css";
 import "react-toastify/dist/ReactToastify.css";
 
 function Recipe() {
@@ -33,10 +34,7 @@ function Recipe() {
             const result = await response.json();
             setRecipeInfo(result);
         } catch (error) {
-            toast.error("Failed to view recipe. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-            });
+            toast.error("Failed to view recipe. Please try again.");
         } finally {
             setLoading(false); // Set loading to false when fetch is done
         }

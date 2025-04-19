@@ -1,9 +1,10 @@
-import { React, useState } from "react";
+import { React, useId, useState } from "react";
 import Async from 'react-select/async';
 import { auth } from "./firebaseConfig";
 import { Formik, Field, Form, ErrorMessage, FieldArray } from "formik";
 import * as Yup from "yup";
 import { toast } from "react-toastify";
+import { useOverlay } from "./OverlayContext";
 
 import TagInput from "./TagInput";
 import ImageSelector from "./ImageSelector";
@@ -102,9 +103,10 @@ const CreateIngredientOption = {
   label: "[ Create new ingredient ]"
 }
 
-function RecipeForm({ values, close }) {
+function RecipeForm({ values, onSuccess }) {
   const [selectedIngredient, setSelectedIngredient] = useState();
-  const [ingredientFormVisible, setIngredientFormVisible] = useState();
+  const { showOverlay, hideOverlay } = useOverlay();
+  const id = useId();
 
   async function searchIngredient(name, callback) {
     if (name === "") {
@@ -112,11 +114,7 @@ function RecipeForm({ values, close }) {
     }
 
     const error = () => {
-      toast.error("Ingredient lookup failed.", {
-        toastId: "ingredient-lookup-error",
-        position: "top-right",
-        autoClose: 3000,
-      });
+      toast.error("Ingredient lookup failed.");
       callback([]);
     }
 
@@ -143,15 +141,23 @@ function RecipeForm({ values, close }) {
       options.push(CreateIngredientOption); // Special options for creating new ingredient
 
       callback(options);
-      close();
+      onSuccess();
     } catch (e) {
       error();
     }
   }
 
+  function showIngredientForm() {
+    showOverlay(id, (
+      <div className="form-container" style={{ width: "600px"}}>
+        <IngredientForm values={getIngredientDefaultValues()} onSuccess={hideOverlay}/>
+      </div>
+    ));
+  }
+
   return (
     <>
-      <div className="form-container">
+      <>
         <h1 className="form-title">Create Recipe</h1>
         <Formik
           validationSchema={validationSchema}
@@ -173,24 +179,15 @@ function RecipeForm({ values, close }) {
               });
 
               if (!response.ok) {
-                toast.error("Failed to submit recipe. Please try again.", {
-                  position: "top-right",
-                  autoClose: 3000,
-                });
+                toast.error("Failed to submit recipe. Please try again.");
                 return;
               }
 
               const result = await response.text();
-              toast.success("Recipe submitted successfully!", {
-                position: "top-right",
-                autoClose: 3000,
-              });
+              toast.success("Recipe submitted successfully!");
               console.log("Recipe ID:", result);
             } catch (error) {
-              toast.error("An error occurred. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-              });
+              toast.error("An error occurred. Please try again.");
             }
           }}
         >
@@ -339,17 +336,14 @@ function RecipeForm({ values, close }) {
 
                       // Check if selected is create ingredient
                       if (option === CreateIngredientOption) {
-                        setIngredientFormVisible(true);
+                        showIngredientForm();
                         return;
                       }
 
                       // Check if ingredient already included
                       for (let ingredient of values.ingredients) {
                         if (ingredient.id === option.value) {
-                          toast.warn("Ingredient is already added", {
-                            position: "top-right",
-                            autoClose: 3000,
-                          });
+                          toast.warn("Ingredient is already added");
 
                           return;
                         }
@@ -518,11 +512,7 @@ function RecipeForm({ values, close }) {
             </Form>
           )}
         </Formik>
-      </div>
-      <div className="overlay" style={{ display: ingredientFormVisible ? "block" : "none" }}>
-        <div className="overlay-background" onClick={() => setIngredientFormVisible(false)}></div>
-        { ingredientFormVisible && <IngredientForm values={getIngredientDefaultValues()} close={() => setIngredientFormVisible(false)}/> }
-      </div>
+      </>
     </>
   );
 }

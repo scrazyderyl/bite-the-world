@@ -32,10 +32,7 @@ function RecipePage() {
             const result = await response.json();
             setRecipeInfo(result);
         } catch (error) {
-            toast.error("Failed to view Recipe. Please try again.", {
-                position: "top-right",
-                autoClose: 3000,
-            });
+            toast.error("Failed to view Recipe. Please try again.");
         } finally {
             setLoading(false);
         }
