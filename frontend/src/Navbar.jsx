@@ -12,10 +12,10 @@ function Navbar({ user, handleLogout }) {
         </div>
         <div className="group align-center">
             <Link to='/'>
-                <button className="link">Map</button>
+                <button className="link underline-hover">Map</button>
             </Link>
             <Link to='/ingredients'>
-                <button className="link">Search</button>
+                <button className="link underline-hover">Search</button>
             </Link>
         </div>
         <div className="group align-right">
@@ -25,7 +25,7 @@ function Navbar({ user, handleLogout }) {
                         <button className="link new-recipe">New Recipe</button>
                     </Link>
                     <Link to='/user'>
-                        <button className="link">{ user.displayName.split(" ")[0] }</button>
+                        <button className="link underline-hover">{ user.displayName.split(" ")[0] }</button>
                     </Link>
                     <button onClick={handleLogout} className="link">Logout</button>
                 </>
