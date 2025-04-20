@@ -11,8 +11,8 @@ nav {
 
 .group {
     position: absolute;
-    display: grid;
-    column-gap: 8px;
+    display: flex;
+    column-gap: 16px;
 }
 
 .align-center {
@@ -28,14 +28,6 @@ nav {
     right: 20px;
 }
 
-.group {
-    list-style: none;
-    display: flex;
-    margin: 0;
-    padding: 0;
-    align-items: center;
-}
-
 .link {
     color: #fff;
     text-decoration: none;
@@ -45,16 +37,38 @@ nav {
     cursor: pointer;
 }
 
+.underline-hover {
+    position: relative;
+}
+
+.underline-hover::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 0;
+    background-color: #7da9d8;
+    transition: width 0.25s ease-in-out;
+  }
+
+.underline-hover:hover::after {
+    width: 100%;
+}
+
 .site-name {
     font-weight: bold;
     margin-left: 20px;
-    color: rgb(164 184 221);
+    color: transparent;
     font-size: 24px;
     line-height: 40px;
+    background: linear-gradient(112deg, rgb(187 199 221), rgb(164 184 221));
+    background-clip: text;
 }
 
 .new-recipe {
     background-color: #4a90e2;
+    transition: 0.2s;
 }
 
 .new-recipe:hover {

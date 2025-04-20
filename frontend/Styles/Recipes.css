@@ -21,6 +21,20 @@
   color: #333;
 }
 
+.recipe-management {
+  right: 20px;
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  column-gap: 16px;
+}
+
+.recipe-action {
+  color: #333;
+  font-weight: 500;
+  cursor: pointer;
+}
+
 .recipe-description {
   margin-bottom: 15px;
   color: #666;
