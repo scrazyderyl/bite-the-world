@@ -104,6 +104,24 @@ class ContentSystem {
         return request.get();
     }
 
+    public boolean userCanEdit(String collection, String documentId, String userId) throws InterruptedException, ExecutionException {
+        ApiFuture<DocumentSnapshot> request = db.collection(collection).document(documentId).get();
+        String authorId = request.get().getString("authorId");
+        
+        return userId.equals(authorId);
+    }
+
+    public boolean editById(String collection, String id, HashMap<String, Object> newValues) {
+        ApiFuture<WriteResult> result = db.collection(collection).document(id).update(newValues);
+        
+        try {
+            result.get();
+            return true;
+        } catch (InterruptedException | ExecutionException e) {
+            return false;
+        }
+    }
+
     public boolean deleteById(String collection, String id) {
         ApiFuture<WriteResult> result = db.collection(collection).document(id).delete();
 

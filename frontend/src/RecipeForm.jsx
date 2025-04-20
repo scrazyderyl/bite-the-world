@@ -151,19 +151,23 @@ function RecipeForm({ values, onSuccess }) {
   return (
     <>
       <>
-        <h1 className="form-title">Create Recipe</h1>
+        <h1 className="form-title">{ values.id ? "Edit Recipe" : "Create Recipe" }</h1>
         <Formik
           validationSchema={validationSchema}
           initialValues={values || getDefaultValues()}
           onSubmit={async (values) => {
             try {
+              // Edit recipe if id is specified
+              const url = values.id ? `http://localhost:8080/recipes/edit/${values.id}` : "http://localhost:8080/recipes/";
+
               const idToken = await auth.currentUser.getIdToken();
+              
               const body = {
                 idToken: idToken,
                 ...values,
               };
 
-              const response = await fetch("http://localhost:8080/recipes/", {
+              const response = await fetch(url, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -397,7 +401,7 @@ function RecipeForm({ values, onSuccess }) {
 
                     return (
                     <div>
-                      <Async className="form-lookup" loadOptions={searchIngredient} defaultOptions={true} components={{ Option: ItalicOption }} onChange={addIngredient} value={selectedIngredient} styles={{
+                      <Async className="form-lookup" loadOptions={searchIngredient} defaultOptions={true} components={{ Option: ItalicOption }} onChange={addIngredient} placeholder="Search..." value={selectedIngredient} styles={{
                         option: (provided, state) => ({
                           ...provided,
                           color: "black"
@@ -545,7 +549,7 @@ function RecipeForm({ values, onSuccess }) {
                 className="submit-button"
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Submit Recipe"}
+                {isSubmitting ? "Submitting..." : (values.id ? "Submit Edit" : "Submit Recipe")}
               </button>
             </Form>
           )}
