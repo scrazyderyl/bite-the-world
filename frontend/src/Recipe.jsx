@@ -1,15 +1,20 @@
-import { useState, useEffect } from 'react';
-import { useParams } from "react-router";
+import { useState, useEffect, useId } from 'react';
+import { useNavigate, useParams } from "react-router";
 import { auth } from "./firebaseConfig";
 import { toast } from "react-toastify";
+import { useOverlay } from "./OverlayContext";
 
 import "../Styles/Recipes.css";
 import "react-toastify/dist/ReactToastify.css";
+import ReportForm, { getDefaultValues } from './ReportForm';
 
-function Recipe() {
+function Recipe({ user }) {
     const [recipeInfo, setRecipeInfo] = useState(null);
     const [loading, setLoading] = useState(true); // Add loading state
     const { recipe_id } = useParams();
+    const navigate = useNavigate();
+    const { showOverlay, hideOverlay } = useOverlay();
+    const id = useId();
 
     const fetchRecipe = async () => {
         try {
@@ -47,10 +52,47 @@ function Recipe() {
     if (loading) {
         return <div>Loading...</div>; // Show loading message
     }
+
+    function editRecipe() {
+      navigate(`/recipes/edit/${recipe_id}`);
+    }
+
+    async function deleteRecipe() {
+      const error = () => toast.error("Could not delete recipe.");
+
+      try {
+        const request = await fetch(`http://localhost:8080/recipes/${recipe_id}`, {
+          method: "DELETE",
+        });
+  
+        if (request.ok) {
+          navigate('/');
+        } else {
+          error();
+        }
+      } catch (e) {
+        error();
+      }
+    }
+
+    function reportRecipe() {
+      showOverlay(id, (
+        <div className="form-container" style={{ width: "600px"}}>
+          <button className="close-button" onClick={() => hideOverlay(id)}></button>
+          <ReportForm values={getDefaultValues(recipe_id, "Recipe")} onSuccess={() => toast.success("Report recieved")}/>
+        </div>
+      ));
+    }
   
     return (recipeInfo &&
         <>
               <div className="recipe-card">
+                { user && recipeInfo.authorId === user.uid && (
+                  <div className='recipe-management'>
+                    <p className='recipe-action' onClick={editRecipe}>✎ Edit</p>
+                    <p className='recipe-action' onClick={deleteRecipe}>✖ Delete</p>
+                  </div>
+                )}
                 {/* <div className="recipe-actions">
                   <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
                     Bookmark
@@ -86,8 +128,7 @@ function Recipe() {
                     <li>No instructions available</li>
                   )}
                 </ol>
-
-
+                <p className='recipe-action' onClick={reportRecipe}>Report</p>
               </div>
         </>
     )

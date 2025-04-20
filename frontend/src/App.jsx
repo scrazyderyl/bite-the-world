@@ -71,23 +71,31 @@ function App() {
               <Login onLogin={updateUser} />
             </div>
           } />
-          <Route path="/recipes/new" element={
-            <div style={styles.pagePadding}>
-              <RecipeEditor user={user}/>
-            </div>
-          }
-          />
           <Route path="/country/:country_code" element={
             <div style={styles.pagePadding}>
               <Country />
             </div>
           } />
-          <Route path ="/recipes/:recipe_id" element={
-            <div style={styles.pagePadding}>
-              <Recipe/>
-            </div>
-          }
-          />
+          <Route path="/recipes">
+            <Route path=":recipe_id" element={
+              <div style={styles.pagePadding}>
+                <Recipe user={user}/>
+              </div>
+            }
+            />
+            <Route path="new" element={
+              <div style={styles.pagePadding}>
+                <RecipeEditor user={user}/>
+              </div>
+            }
+            />
+            <Route path="edit/:recipe_id" element={
+              <div style={styles.pagePadding}>
+                <RecipeEditor user={user}/>
+              </div>
+            }
+            />
+          </Route>
         </Routes>
       </div>
     </>

@@ -1,5 +1,10 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,10 +63,9 @@ public class RecipeController {
         }
     }
 
-    @PostMapping(value = "/")
+    @PostMapping("/")
     public ResponseEntity<String> submit(@RequestBody @Valid RecipeSubmission submission) {
         try {
-            System.out.println("Submitting recipe: " + submission.name);
             Recipe recipe = submission.toRecipe();
             String id = contentSystem.submit("recipes", recipe);
 
@@ -72,6 +76,37 @@ public class RecipeController {
             return ResponseEntity.ok(id);
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(401).build();
+        }
+    }
+
+    @PostMapping("/edit/{id}")
+    public ResponseEntity<String> edit(@PathVariable String id, @RequestBody @Valid RecipeSubmission submission) {
+        try {
+        // Check if user is authorized to edit recipe
+            String uid = accountSystem.getUID(submission.idToken);
+            
+            if (uid == null || !contentSystem.userCanEdit("recipes", id, uid)) {
+                return ResponseEntity.status(401).build();
+            }
+
+            HashMap<String, Object> edits = submission.toMap();
+
+            // Rebuild ingredient id array
+            ArrayList<String> ingredientIds = new ArrayList<>(submission.ingredients.size());
+
+            for (IngredientWithQuantity ingredient : submission.ingredients) {
+                ingredientIds.add(ingredient.id);
+            }
+
+            edits.put("ingredientsstrings", ingredientIds);
+            edits.put("lastUpdated", new Date());
+
+            boolean edited = contentSystem.editById("recipes", id, edits);
+            return edited ? ResponseEntity.ok(id) : ResponseEntity.internalServerError().build();
+        } catch (FirebaseAuthException e) {
+            return ResponseEntity.status(401).build();
+        } catch (InterruptedException | ExecutionException e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 

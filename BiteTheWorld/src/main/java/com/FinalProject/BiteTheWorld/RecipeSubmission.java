@@ -1,6 +1,9 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.HashMap;
 import java.util.List;
+
+import javax.annotation.Nonnegative;
 
 import org.hibernate.validator.constraints.URL;
 
@@ -9,7 +12,6 @@ import com.google.firebase.auth.FirebaseAuthException;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 class RecipeSubmission {
@@ -30,13 +32,13 @@ class RecipeSubmission {
 
     public List<@URL String> images;
 
-    @Positive
+    @Nonnegative
     public int prepTime;
     
-    @Positive
+    @Nonnegative
     public int cookTime;
 
-    @Positive
+    @Nonnegative
     public int servings;
 
     @NotEmpty
@@ -60,5 +62,23 @@ class RecipeSubmission {
 
         return new Recipe(name, authorId, tags, countries, description, images, prepTime, cookTime, servings, ingredients,
                 directions, notes, ingredientStrings(ingredients));
+    }
+
+    public HashMap<String, Object> toMap() {
+        HashMap<String, Object> map = new HashMap<>() {{
+            put("name", name);
+            put("tags", tags);
+            put("countries", countries);
+            put("description", description);
+            put("images", images);
+            put("prepTime", prepTime);
+            put("cookTime", cookTime);
+            put("servings", servings);
+            put("ingredients", ingredients);
+            put("directions", directions);
+            put("notes", notes);
+        }};
+
+        return map;
     }
 }
