@@ -202,12 +202,21 @@ class ContentSystem {
         return featuredRecipe;
     }
 
-    public List<Recipe> recommendFromHistory(History history) {
+    public List<Recipe> recommendFromHistory(String userId) {
         try {
             // Fetch all recipes from Firestore
+
+            History history = db.collection("accounts").document(userId).get().get().toObject(History.class);
+            
+            if (history == null || history.postViews == null || history.postViews.isEmpty()) {
+                System.err.println("No history available for user: " + userId);
+                return List.of(); // No history available
+            }
             ApiFuture<QuerySnapshot> request = db.collection("recipes").get();
             List<Recipe> allRecipes = request.get().toObjects(Recipe.class);
     
+            System.out.println("All recipes: " + allRecipes.size());
+            System.out.println("History post views: " + history.postViews.size());
             // Call Gemini to generate recommendations
             String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
     

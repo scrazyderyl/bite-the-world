@@ -24,14 +24,21 @@ import java.util.List;
 public class GeminiController {
 
     private final ContentSystem contentSystem;
+    private final AccountSystem accountSystem;
 
     public GeminiController(ContentSystem contentSystem) {
         this.contentSystem = contentSystem;
+        this.accountSystem = AccountSystem.getInstance();
     }
 
     @PostMapping("/recommendations")
-    public ResponseEntity<List<Recipe>> getRecommendations(@RequestBody History history) {
-        List<Recipe> recommendations = contentSystem.recommendFromHistory(history);
-        return ResponseEntity.ok(recommendations);
+    public ResponseEntity<List<Recipe>> getRecommendations(@RequestBody IdToken idToken) {
+        try {
+            String userId = accountSystem.getUID(idToken.idToken);
+            List<Recipe> recommendations = contentSystem.recommendFromHistory(userId);
+            return ResponseEntity.ok(recommendations);
+        } catch (FirebaseAuthException e) {
+            return ResponseEntity.status(401).build(); // Return 401 Unauthorized if authentication fails
+        }
     }
 }
