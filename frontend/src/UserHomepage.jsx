@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
 import { RecipeForm, getDefaultValues } from './RecipeForm';
+import { auth } from "./firebaseConfig";
 
 const UserHomePage = ({ user }) => {
   const navigate = useNavigate();
@@ -104,6 +105,34 @@ const UserHomePage = ({ user }) => {
     toast.info("Bookmark removed");
   };
 
+  const getRecommendedRecipes = async () => {
+    console.log("Fetching recommended recipes...");
+    // Fetch recommended recipes from the backend or use a static list for now
+    const idToken = await auth.currentUser.getIdToken();
+    const body = {
+      idToken: idToken,
+    };
+
+    const response = await fetch("http://localhost:8080/api/gemini/recommendations", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    // Handle the response as needed
+    if (!response.ok) {
+      toast.error("Failed to retrieve recommendation. Please try again.");
+      return;
+    }
+
+    const result = await response.text();
+    toast.success("Recommendation recieved successfully!");
+    console.log("Recommended recipes:", result);
+    // Update the state with the recommended recipes
+  };
+
   return (
     <div className="user-homepage">
       <div className="header">
@@ -130,6 +159,14 @@ const UserHomePage = ({ user }) => {
         >
           Bookmarked Recipes
         </button>
+        <button 
+          className={`tab-btn ${activeTab === 'recommended' ? 'active' : ''}`}
+          onClick={() => { setActiveTab('recommended'); getRecommendedRecipes();}}
+        >
+          Recomended Recipe
+        </button>
+
+
       </div>
 
       {/* Welcome Message - Shown when no tab is selected */}
@@ -254,6 +291,16 @@ const UserHomePage = ({ user }) => {
             <p className="no-bookmarks">No bookmarked recipes yet. Explore recipes and bookmark your favorites!</p>
           )}
         </div>
+      )}
+
+      {/* Recommended Recipes Tab */}
+      {activeTab === 'recommended' && (
+        <div>
+          <h2>Recommended Recipes</h2>
+          <p>Here are some recipes we think you might like!</p>
+          {/* Add your recommended recipes logic here */}
+        </div>
+
       )}
     </div>
   );
