@@ -15,7 +15,8 @@ const UserHomePage = ({ user }) => {
   const [bookmarkedRecipes, setBookmarkedRecipes] = useState([]);
   const [showDraftModal, setShowDraftModal] = useState(false);
   const [editingDraft, setEditingDraft] = useState(null);
-  
+  const [recommendedRecipes, setRecommendedRecipes] = useState([]);
+
   // Redirect to login page if not logged in
   if (!user) {
     navigate("/login");
@@ -26,7 +27,7 @@ const UserHomePage = ({ user }) => {
     fetch("/recipes.json")
       .then(res => res.json())
       .then(data => setRecipes(data));
-    
+
     // drafts from localStorage
     const savedDrafts = localStorage.getItem('recipeDrafts');
     if (savedDrafts) {
@@ -62,14 +63,14 @@ const UserHomePage = ({ user }) => {
 
   // eslint-disable-next-line no-unused-vars
   const handleSaveDraft = (values) => {
-    const updatedDrafts = editingDraft.id 
-      ? drafts.map(d => d.id === editingDraft.id ? {...values, id: editingDraft.id} : d)
-      : [...drafts, {...values, id: Date.now()}];
-    
+    const updatedDrafts = editingDraft.id
+      ? drafts.map(d => d.id === editingDraft.id ? { ...values, id: editingDraft.id } : d)
+      : [...drafts, { ...values, id: Date.now() }];
+
     setDrafts(updatedDrafts);
     setShowDraftModal(false);
     setEditingDraft(null);
-    
+
     toast.success("Draft saved successfully!");
   };
 
@@ -86,10 +87,10 @@ const UserHomePage = ({ user }) => {
       cookingTime: draft.totalTime,
       steps: draft.steps.map(s => s.step)
     };
-    
+
     setRecipes([...recipes, newRecipe]);
     setDrafts(drafts.filter(d => d.id !== draft.id));
-    
+
     toast.success("Recipe published successfully!");
   };
 
@@ -106,32 +107,33 @@ const UserHomePage = ({ user }) => {
   };
 
   const getRecommendedRecipes = async () => {
-    console.log("Fetching recommended recipes...");
-    // Fetch recommended recipes from the backend or use a static list for now
-    const idToken = await auth.currentUser.getIdToken();
-    const body = {
-      idToken: idToken,
-    };
+    try {
+      console.log("Fetching recommended recipes...");
+      const idToken = await auth.currentUser.getIdToken();
+      const body = { idToken };
 
-    const response = await fetch("http://localhost:8080/api/gemini/recommendations", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+      const response = await fetch("http://localhost:8080/api/gemini/recommendations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    // Handle the response as needed
-    if (!response.ok) {
-      toast.error("Failed to retrieve recommendation. Please try again.");
-      return;
+      if (!response.ok) {
+        toast.error("Failed to retrieve recommendations.");
+        return;
+      }
+
+      const recommended = await response.json();
+      setRecommendedRecipes(recommended);
+      toast.success("Recommendations received!");
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      toast.error("Something went wrong while fetching recommendations.");
     }
-
-    const result = await response.text();
-    toast.success("Recommendation recieved successfully!");
-    console.log("Recommended recipes:", result);
-    // Update the state with the recommended recipes
   };
+
 
   return (
     <div className="user-homepage">
@@ -141,27 +143,27 @@ const UserHomePage = ({ user }) => {
 
       {/* Tab Navigation */}
       <div className="tab-navigation" style={styles.tabNavigation}>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'myRecipes' ? 'active' : ''}`}
           onClick={() => setActiveTab('myRecipes')}
         >
           My Recipes
         </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'drafts' ? 'active' : ''}`}
           onClick={() => setActiveTab('drafts')}
         >
           Drafts
         </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'bookmarked' ? 'active' : ''}`}
           onClick={() => setActiveTab('bookmarked')}
         >
           Bookmarked Recipes
         </button>
-        <button 
+        <button
           className={`tab-btn ${activeTab === 'recommended' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('recommended'); getRecommendedRecipes();}}
+          onClick={() => { setActiveTab('recommended'); getRecommendedRecipes(); }}
         >
           Recomended Recipe
         </button>
@@ -255,7 +257,7 @@ const UserHomePage = ({ user }) => {
             bookmarkedRecipes.map(recipe => (
               <div key={recipe.id} className="recipe-card">
                 <div className="recipe-actions">
-                  <button 
+                  <button
                     className="remove-bookmark-btn"
                     onClick={() => handleRemoveBookmark(recipe.id)}
                   >
@@ -295,13 +297,47 @@ const UserHomePage = ({ user }) => {
 
       {/* Recommended Recipes Tab */}
       {activeTab === 'recommended' && (
-        <div>
+        <div className="recipes-container">
           <h2>Recommended Recipes</h2>
-          <p>Here are some recipes we think you might like!</p>
-          {/* Add your recommended recipes logic here */}
+          {recommendedRecipes.length > 0 ? (
+            recommendedRecipes.map(recipe => (
+              <div key={recipe.id} className="recipe-card">
+                <div className="recipe-actions">
+                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
+                    Bookmark
+                  </button>
+                </div>
+                <h2 className="recipe-title">{recipe.name}</h2>
+                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
+                <p className="recipe-description">Servings: {recipe.servings}</p>
+                <h3 className="recipe-description">Ingredients: </h3>
+                <ul className="ingredient-list">
+                  {recipe.ingredients.map((ing, i) => (
+                    <li key={i} className="ingredient-item">
+                      {ing.quantity} {ing.unit} {ing.ingredient || ing.name}
+                    </li>
+                  ))}
+                </ul>
+                <h3 className="recipe-description">Instructions: </h3>
+                <ol>
+                  {Array.isArray(recipe.steps) ? (
+                    recipe.steps.map((step, i) => (
+                      <li key={i} className="ingredient-item">
+                        {typeof step === 'object' ? step.step : step}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No instructions available</li>
+                  )}
+                </ol>
+              </div>
+            ))
+          ) : (
+            <p>No recommendations yet. Click the tab again to try fetching them.</p>
+          )}
         </div>
-
       )}
+
     </div>
   );
 };

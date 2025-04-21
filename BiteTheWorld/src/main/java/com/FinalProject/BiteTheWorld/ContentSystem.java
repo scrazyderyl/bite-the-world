@@ -226,10 +226,16 @@ class ContentSystem {
             System.out.println("History post views: " + history.postViews.size());
             // Call Gemini to generate recommendations
             String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
-
             System.out.println("Recommendations JSON: " + json);
-            // Parse and return the recommended recipes
-            return GeminiIntegration.parseRecommendations(json);
+            
+            List<Recipe> recommendations = GeminiIntegration.parseRecommendations(json);
+            if (recommendations == null) {
+                System.err.println("Failed to parse recommendations.");
+                return List.of();
+            }
+            
+            return recommendations;
+            
         } catch (Exception e) {
             System.out.println("Error in recommendFromHistory: " + e.getMessage());
             return List.of();

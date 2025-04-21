@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -32,13 +33,24 @@ public class GeminiController {
     }
 
     @PostMapping("/recommendations")
-    public ResponseEntity<List<Recipe>> getRecommendations(@RequestBody IdToken idToken) {
-        try {
-            String userId = accountSystem.getUID(idToken.idToken);
-            List<Recipe> recommendations = contentSystem.recommendFromHistory(userId);
-            return ResponseEntity.ok(recommendations);
-        } catch (FirebaseAuthException e) {
-            return ResponseEntity.status(401).build(); // Return 401 Unauthorized if authentication fails
-        }
+public ResponseEntity<List<Recipe>> getRecommendations(@RequestBody IdToken idToken) {
+    try {
+        String userId = accountSystem.getUID(idToken.idToken);
+        List<Recipe> recommendations = contentSystem.recommendFromHistory(userId);
+
+        // LOGGING for debug
+        System.out.println("Sending recommendations: " + recommendations.size());
+
+        return ResponseEntity.ok(recommendations);
+    } catch (FirebaseAuthException e) {
+        System.err.println("Auth failed: " + e.getMessage());
+
+        // Option A: return an empty list
+        return ResponseEntity.status(401).body(Collections.emptyList());
+
+        // Option B (better): return JSON error
+        // return ResponseEntity.status(401).body(Collections.singletonMap("error", "Unauthorized"));
     }
+}
+
 }

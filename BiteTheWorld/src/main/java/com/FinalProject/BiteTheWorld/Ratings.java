@@ -1,7 +1,9 @@
 package com.FinalProject.BiteTheWorld;
 
 import java.util.HashMap;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 class Ratings {
     public HashMap<String, Integer> ratings;
     public int sum;
