@@ -14,7 +14,7 @@ function Country() {
       
     return (countryInfo &&
         <>
-            <h1>{ countryInfo.name }</h1>
+            <h1>{ countryInfo.country.name }</h1>
             <p style={styles.summary}>{ countryInfo.country.summary }</p>
             <h2>Recipes</h2>
             <div className="recipes-container">
