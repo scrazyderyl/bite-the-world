@@ -163,6 +163,27 @@ class ContentSystem {
         }
     }
 
+    public List<RecipeOverview> getRecipesByUser(String userId) {
+        try {
+            ApiFuture<QuerySnapshot> request = db.collection("recipes")
+                    .whereEqualTo("authorId", userId)
+                    .get();
+
+            List<Recipe> recipes = request.get().toObjects(Recipe.class);
+
+            List<RecipeOverview> recipeOverviews = new ArrayList<>(recipes.size());
+
+            for (Recipe recipe : recipes) {
+                recipeOverviews.add(recipe.toListing());
+            }
+            
+            return recipeOverviews;
+        } catch (InterruptedException | ExecutionException e) {
+            System.out.println("Error fetching recipes by user: " + e.getMessage());
+            return List.of();
+        }
+    }
+
     public CountryInfo getCountryInfo(String country_code) {
         return countries.get(country_code);
     }
