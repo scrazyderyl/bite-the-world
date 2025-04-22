@@ -18,7 +18,7 @@ function Recipe({ user }) {
 
     const fetchRecipe = async () => {
         try {
-            const idToken = await auth.currentUser.getIdToken();
+            const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : null;
             const body = {
                 idToken: idToken,
             };
@@ -107,6 +107,7 @@ function Recipe({ user }) {
             <p className="recipe-description">Total Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
             <p className="recipe-description">Servings: {recipeInfo.servings}</p>
           </div>
+          <p className="recipe-description summary">{recipeInfo.description}</p>
           {/* Replace with proper image viewer */}
           <img className="recipe-image" src={recipeInfo.images && recipeInfo.images[0] ? recipeInfo.images[0] : null} width="500" />
           
