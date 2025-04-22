@@ -189,6 +189,9 @@ const UserHomePage = ({ user }) => {
           {recipes.length > 0 ? (
             recipes.map(recipe => (
               <>
+                <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)} style={{ marginBottom: "10px" }}>
+                  Bookmark
+                </button>
                 <RecipeCard recipe={recipe} key={recipe.id} />
               </>
             ))
