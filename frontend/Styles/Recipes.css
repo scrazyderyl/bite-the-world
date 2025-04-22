@@ -13,12 +13,33 @@
   margin-bottom: 30px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
   background-color: #fff;
+  color: black;
 }
 
-.recipe-title {
-  font-size: 1.5em;
+.page-title {
+  font-size: 28px;
   margin-bottom: 10px;
   color: #333;
+}
+
+.recipe-metadata {
+  display: flex;
+  column-gap: 30px;
+}
+
+.author-name {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.date {
+  font-size: 18px;
+  color: #666;
+}
+
+.recipe-details {
+  display: flex;
+  column-gap: 20px;
 }
 
 .recipe-management {

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
-import com.google.gson.Gson;
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
@@ -212,8 +210,7 @@ class ContentSystem {
         try {
             // Fetch all recipes from Firestore
 
-            Account account =
-            db.collection("accounts").document(userId).get().get().toObject(Account.class);
+            Account account = db.collection("accounts").document(userId).get().get().toObject(Account.class);
             History history = account.history;
 
             if (history == null || history.postViews == null || history.postViews.isEmpty()) {

@@ -35,6 +35,12 @@ public class RecipeController {
             if (recipe == null) {
                 return ResponseEntity.notFound().build();
             }
+
+            try {
+                recipe.authorName = accountSystem.getUserById(recipe.authorId).getDisplayName();
+            } catch (FirebaseAuthException e) {
+                
+            }
             
             ObjectMapper mapper = new ObjectMapper();
             ObjectWriter writer;
@@ -49,7 +55,7 @@ public class RecipeController {
             }
 
             String serializedRecipe = writer.writeValueAsString(recipe);
-            contentSystem.updateRecipeViews(id, recipe.views);
+            contentSystem.updateRecipeViews(id, recipe.views + 1);
 
             return ResponseEntity.ok(serializedRecipe);
         } catch (Exception e) {
