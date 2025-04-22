@@ -99,7 +99,6 @@ function Recipe({ user }) {
                   </button>
                 </div> */}
                 <h2 className="recipe-title">{recipeInfo.name}</h2>
-                <p className="recipe-description">Author: {recipeInfo.authorId} Date: {recipeInfo.lastUpdated} Views: {recipeInfo.views}</p>
                 <p className="recipe-description">Cooking Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
                 <p className="recipe-description">Servings: {recipeInfo.servings}</p>
                 

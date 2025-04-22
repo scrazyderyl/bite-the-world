@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
-import { RecipeForm, getDefaultValues } from './RecipeForm';
+import { RecipeForm, getDefaultValues } from "./RecipeForm";
 import { auth } from "./firebaseConfig";
 
 const UserHomePage = ({ user }) => {
@@ -25,17 +25,17 @@ const UserHomePage = ({ user }) => {
   useEffect(() => {
     // published recipes
     fetch("/recipes.json")
-      .then(res => res.json())
-      .then(data => setRecipes(data));
+      .then((res) => res.json())
+      .then((data) => setRecipes(data));
 
     // drafts from localStorage
-    const savedDrafts = localStorage.getItem('recipeDrafts');
+    const savedDrafts = localStorage.getItem("recipeDrafts");
     if (savedDrafts) {
       setDrafts(JSON.parse(savedDrafts));
     }
 
     // bookmarked recipes from localStorage
-    const savedBookmarks = localStorage.getItem('bookmarkedRecipes');
+    const savedBookmarks = localStorage.getItem("bookmarkedRecipes");
     if (savedBookmarks) {
       setBookmarkedRecipes(JSON.parse(savedBookmarks));
     }
@@ -43,12 +43,15 @@ const UserHomePage = ({ user }) => {
 
   // drafts to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('recipeDrafts', JSON.stringify(drafts));
+    localStorage.setItem("recipeDrafts", JSON.stringify(drafts));
   }, [drafts]);
 
   // ookmarks to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('bookmarkedRecipes', JSON.stringify(bookmarkedRecipes));
+    localStorage.setItem(
+      "bookmarkedRecipes",
+      JSON.stringify(bookmarkedRecipes)
+    );
   }, [bookmarkedRecipes]);
 
   const handleCreateDraft = () => {
@@ -64,7 +67,9 @@ const UserHomePage = ({ user }) => {
   // eslint-disable-next-line no-unused-vars
   const handleSaveDraft = (values) => {
     const updatedDrafts = editingDraft.id
-      ? drafts.map(d => d.id === editingDraft.id ? { ...values, id: editingDraft.id } : d)
+      ? drafts.map((d) =>
+          d.id === editingDraft.id ? { ...values, id: editingDraft.id } : d
+        )
       : [...drafts, { ...values, id: Date.now() }];
 
     setDrafts(updatedDrafts);
@@ -75,7 +80,7 @@ const UserHomePage = ({ user }) => {
   };
 
   const handleDeleteDraft = (draftId) => {
-    setDrafts(drafts.filter(d => d.id !== draftId));
+    setDrafts(drafts.filter((d) => d.id !== draftId));
     toast.info("Draft deleted");
   };
 
@@ -85,24 +90,24 @@ const UserHomePage = ({ user }) => {
       ...draft,
       id: `recipe-${Date.now()}`,
       cookingTime: draft.totalTime,
-      steps: draft.steps.map(s => s.step)
+      steps: draft.steps.map((s) => s.step),
     };
 
     setRecipes([...recipes, newRecipe]);
-    setDrafts(drafts.filter(d => d.id !== draft.id));
+    setDrafts(drafts.filter((d) => d.id !== draft.id));
 
     toast.success("Recipe published successfully!");
   };
 
   const handleBookmarkRecipe = (recipe) => {
-    if (!bookmarkedRecipes.some(r => r.id === recipe.id)) {
+    if (!bookmarkedRecipes.some((r) => r.id === recipe.id)) {
       setBookmarkedRecipes([...bookmarkedRecipes, recipe]);
       toast.success("Recipe bookmarked!");
     }
   };
 
   const handleRemoveBookmark = (recipeId) => {
-    setBookmarkedRecipes(bookmarkedRecipes.filter(r => r.id !== recipeId));
+    setBookmarkedRecipes(bookmarkedRecipes.filter((r) => r.id !== recipeId));
     toast.info("Bookmark removed");
   };
 
@@ -112,13 +117,16 @@ const UserHomePage = ({ user }) => {
       const idToken = await auth.currentUser.getIdToken();
       const body = { idToken };
 
-      const response = await fetch("http://localhost:8080/api/gemini/recommendations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      });
+      const response = await fetch(
+        "http://localhost:8080/api/gemini/recommendations",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        }
+      );
 
       if (!response.ok) {
         toast.error("Failed to retrieve recommendations.");
@@ -134,7 +142,6 @@ const UserHomePage = ({ user }) => {
     }
   };
 
-
   return (
     <div className="user-homepage">
       <div className="header">
@@ -144,31 +151,32 @@ const UserHomePage = ({ user }) => {
       {/* Tab Navigation */}
       <div className="tab-navigation" style={styles.tabNavigation}>
         <button
-          className={`tab-btn ${activeTab === 'myRecipes' ? 'active' : ''}`}
-          onClick={() => setActiveTab('myRecipes')}
+          className={`tab-btn ${activeTab === "myRecipes" ? "active" : ""}`}
+          onClick={() => setActiveTab("myRecipes")}
         >
           My Recipes
         </button>
         <button
-          className={`tab-btn ${activeTab === 'drafts' ? 'active' : ''}`}
-          onClick={() => setActiveTab('drafts')}
+          className={`tab-btn ${activeTab === "drafts" ? "active" : ""}`}
+          onClick={() => setActiveTab("drafts")}
         >
           Drafts
         </button>
         <button
-          className={`tab-btn ${activeTab === 'bookmarked' ? 'active' : ''}`}
-          onClick={() => setActiveTab('bookmarked')}
+          className={`tab-btn ${activeTab === "bookmarked" ? "active" : ""}`}
+          onClick={() => setActiveTab("bookmarked")}
         >
           Bookmarked Recipes
         </button>
         <button
-          className={`tab-btn ${activeTab === 'recommended' ? 'active' : ''}`}
-          onClick={() => { setActiveTab('recommended'); getRecommendedRecipes(); }}
+          className={`tab-btn ${activeTab === "recommended" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("recommended");
+            getRecommendedRecipes();
+          }}
         >
           Recomended Recipe
         </button>
-
-
       </div>
 
       {/* Welcome Message - Shown when no tab is selected */}
@@ -177,25 +185,34 @@ const UserHomePage = ({ user }) => {
           <div className="welcome-message">
             <h3>Get Started with Bite the World</h3>
             <p>Select a button to manage your recipes, drafts, or bookmarks.</p>
-            <p>Or create a new recipe by clicking the "Create New Recipe" button</p>
+            <p>
+              Or create a new recipe by clicking the "Create New Recipe" button
+            </p>
           </div>
         </div>
       )}
 
       {/* My Recipes Tab */}
-      {activeTab === 'myRecipes' && (
+      {activeTab === "myRecipes" && (
         <div className="recipes-container">
           {recipes.length > 0 ? (
-            recipes.map(recipe => (
+            recipes.map((recipe) => (
               <div key={recipe.id} className="recipe-card">
                 <div className="recipe-actions">
-                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
+                  <button
+                    className="bookmark-btn"
+                    onClick={() => handleBookmarkRecipe(recipe)}
+                  >
                     Bookmark
                   </button>
                 </div>
                 <h2 className="recipe-title">{recipe.name}</h2>
-                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
-                <p className="recipe-description">Servings: {recipe.servings}</p>
+                <p className="recipe-description">
+                  Cooking Time: {recipe.cookingTime || recipe.totalTime}
+                </p>
+                <p className="recipe-description">
+                  Servings: {recipe.servings}
+                </p>
                 <h3 className="recipe-description">Ingredients: </h3>
                 <ul className="ingredient-list">
                   {recipe.ingredients.map((ing, i) => (
@@ -209,7 +226,7 @@ const UserHomePage = ({ user }) => {
                   {Array.isArray(recipe.steps) ? (
                     recipe.steps.map((step, i) => (
                       <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
+                        {typeof step === "object" ? step.step : step}
                       </li>
                     ))
                   ) : (
@@ -219,17 +236,19 @@ const UserHomePage = ({ user }) => {
               </div>
             ))
           ) : (
-            <p className="no-recipes">No recipes yet. Create your first recipe!</p>
+            <p className="no-recipes">
+              No recipes yet. Create your first recipe!
+            </p>
           )}
         </div>
       )}
 
       {/* Drafts Tab */}
-      {activeTab === 'drafts' && (
+      {activeTab === "drafts" && (
         <div className="drafts-container">
           {drafts.length > 0 ? (
             <div className="drafts-grid">
-              {drafts.map(draft => (
+              {drafts.map((draft) => (
                 <div key={draft.id} className="draft-card">
                   <h3>{draft.name || "Untitled Recipe"}</h3>
                   <p>Prep Time: {draft.prepTime}</p>
@@ -238,78 +257,100 @@ const UserHomePage = ({ user }) => {
                   <p>Steps: {draft.steps.length}</p>
                   <div className="draft-actions">
                     <button onClick={() => handleEditDraft(draft)}>Edit</button>
-                    <button onClick={() => handlePublishDraft(draft)}>Publish</button>
-                    <button onClick={() => handleDeleteDraft(draft.id)}>Delete</button>
+                    <button onClick={() => handlePublishDraft(draft)}>
+                      Publish
+                    </button>
+                    <button onClick={() => handleDeleteDraft(draft.id)}>
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="no-drafts">No draft recipes yet. Start creating your first recipe!</p>
+            <p className="no-drafts">
+              No draft recipes yet. Start creating your first recipe!
+            </p>
           )}
         </div>
       )}
 
       {/* Bookmarked Recipes Tab */}
-      {activeTab === 'bookmarked' && (
-        <div className="recipes-container">
-          {bookmarkedRecipes.length > 0 ? (
-            bookmarkedRecipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card">
-                <div className="recipe-actions">
-                  <button
-                    className="remove-bookmark-btn"
-                    onClick={() => handleRemoveBookmark(recipe.id)}
-                  >
-                    Remove Bookmark
-                  </button>
-                </div>
-                <h2 className="recipe-title">{recipe.name}</h2>
-                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
-                <p className="recipe-description">Servings: {recipe.servings}</p>
-                <h3 className="recipe-description">Ingredients: </h3>
-                <ul className="ingredient-list">
-                  {recipe.ingredients.map((ing, i) => (
-                    <li key={i} className="ingredient-item">
-                      {ing.quantity} {ing.unit} {ing.ingredient || ing.name}
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="recipe-description">Instructions: </h3>
-                <ol>
-                  {Array.isArray(recipe.steps) ? (
-                    recipe.steps.map((step, i) => (
+      {activeTab === "bookmarked" && (
+        <div className="recommended-recipes">
+          <div className="recipes-container">
+            {bookmarkedRecipes.length > 0 ? (
+              bookmarkedRecipes.map((recipe) => (
+                <div key={recipe.id} className="recipe-card">
+                  <div className="recipe-actions">
+                    <button
+                      className="remove-bookmark-btn"
+                      onClick={() => handleRemoveBookmark(recipe.id)}
+                    >
+                      Remove Bookmark
+                    </button>
+                  </div>
+                  <h2 className="recipe-title">{recipe.name}</h2>
+                  <p className="recipe-description">
+                    Cooking Time: {recipe.cookingTime || recipe.totalTime}
+                  </p>
+                  <p className="recipe-description">
+                    Servings: {recipe.servings}
+                  </p>
+                  <h3 className="recipe-description">Ingredients: </h3>
+                  <ul className="ingredient-list">
+                    {recipe.ingredients.map((ing, i) => (
                       <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
+                        {ing.quantity} {ing.unit} {ing.ingredient || ing.name}
                       </li>
-                    ))
-                  ) : (
-                    <li>No instructions available</li>
-                  )}
-                </ol>
-              </div>
-            ))
-          ) : (
-            <p className="no-bookmarks">No bookmarked recipes yet. Explore recipes and bookmark your favorites!</p>
-          )}
+                    ))}
+                  </ul>
+                  <h3 className="recipe-description">Instructions: </h3>
+                  <ol>
+                    {Array.isArray(recipe.steps) ? (
+                      recipe.steps.map((step, i) => (
+                        <li key={i} className="ingredient-item">
+                          {typeof step === "object" ? step.step : step}
+                        </li>
+                      ))
+                    ) : (
+                      <li>No instructions available</li>
+                    )}
+                  </ol>
+                </div>
+              ))
+            ) : (
+              <p className="no-bookmarks">
+                No bookmarked recipes yet. Explore recipes and bookmark your
+                favorites!
+              </p>
+            )}
+          </div>
         </div>
       )}
 
       {/* Recommended Recipes Tab */}
-      {activeTab === 'recommended' && (
+      {activeTab === "recommended" && (
         <div className="recipes-container">
           <h2>Recommended Recipes</h2>
           {recommendedRecipes.length > 0 ? (
-            recommendedRecipes.map(recipe => (
+            recommendedRecipes.map((recipe) => (
               <div key={recipe.id} className="recipe-card">
                 <div className="recipe-actions">
-                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
+                  <button
+                    className="bookmark-btn"
+                    onClick={() => handleBookmarkRecipe(recipe)}
+                  >
                     Bookmark
                   </button>
                 </div>
                 <h2 className="recipe-title">{recipe.name}</h2>
-                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
-                <p className="recipe-description">Servings: {recipe.servings}</p>
+                <p className="recipe-description">
+                  Cooking Time: {recipe.cookingTime || recipe.totalTime}
+                </p>
+                <p className="recipe-description">
+                  Servings: {recipe.servings}
+                </p>
                 <h3 className="recipe-description">Ingredients: </h3>
                 <ul className="ingredient-list">
                   {recipe.ingredients.map((ing, i) => (
@@ -323,7 +364,7 @@ const UserHomePage = ({ user }) => {
                   {Array.isArray(recipe.steps) ? (
                     recipe.steps.map((step, i) => (
                       <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
+                        {typeof step === "object" ? step.step : step}
                       </li>
                     ))
                   ) : (
@@ -333,11 +374,12 @@ const UserHomePage = ({ user }) => {
               </div>
             ))
           ) : (
-            <p>No recommendations yet. Click the tab again to try fetching them.</p>
+            <p>
+              No recommendations yet. Click the tab again to try fetching them.
+            </p>
           )}
         </div>
       )}
-
     </div>
   );
 };
@@ -346,8 +388,8 @@ const styles = {
   tabNavigation: {
     display: "grid",
     gridTemplateColumns: "max-content max-content max-content",
-    columnGap: "12px"
-  }
-}
+    columnGap: "12px",
+  },
+};
 
 export default UserHomePage;
