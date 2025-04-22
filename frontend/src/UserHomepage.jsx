@@ -162,14 +162,14 @@ const UserHomePage = ({ user }) => {
         >
           Bookmarked Recipes
         </button>
+      </div>
+      <div className="tab-navigation" style={styles.tabNavigation}>
         <button
           className={`tab-btn ${activeTab === 'recommended' ? 'active' : ''}`}
           onClick={() => { setActiveTab('recommended'); getRecommendedRecipes(); }}
         >
-          Recomended Recipe
+          Recomend Recipes
         </button>
-
-
       </div>
 
       {/* Welcome Message - Shown when no tab is selected */}
@@ -318,7 +318,9 @@ const styles = {
   tabNavigation: {
     display: "grid",
     gridTemplateColumns: "max-content max-content max-content",
-    columnGap: "12px"
+    columnGap: "12px",
+    marginTop: "20px",
+    marginBottom: "20px",
   }
 }
 
