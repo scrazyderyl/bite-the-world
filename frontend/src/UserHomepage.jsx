@@ -227,7 +227,7 @@ const UserHomePage = ({ user }) => {
 
       {/* Drafts Tab */}
       {activeTab === 'drafts' && (
-        <div className="drafts-container">
+        <div className="recipes-container">
           {drafts.length > 0 ? (
             <div className="drafts-grid">
               {drafts.map(draft => (
