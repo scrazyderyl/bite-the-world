@@ -33,8 +33,13 @@
   }
   
   .card-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    height: 200px;
+    height: 300px;
+    font-size: 20px;
+    background-color: lightgray;
     overflow: hidden;
   }
   

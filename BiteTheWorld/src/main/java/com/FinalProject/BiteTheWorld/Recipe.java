@@ -1,18 +1,18 @@
 package com.FinalProject.BiteTheWorld;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.firestore.annotation.Exclude;
 
 class Recipe {
     @DocumentId private String id;
     public String name;
     public String authorId;
+    @Exclude public String authorName;
     public Date lastUpdated;
     public List<String> tags;
     public List<Country> countries;

@@ -63,6 +63,10 @@ class AccountSystem {
         return uid;
     }
 
+    public UserRecord getUserById(String uid) throws FirebaseAuthException {
+        return auth.getUser(uid);
+    }
+
     public void addToHistory(String userId, String recipeId) {
         try {
             DocumentReference ref = db.collection("accounts").document(userId);

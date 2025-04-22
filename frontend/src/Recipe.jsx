@@ -37,6 +37,10 @@ function Recipe({ user }) {
             }
 
             const result = await response.json();
+
+            // Convert date to readable format
+            result.lastUpdated = new Date(result.lastUpdated).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
+
             setRecipeInfo(result);
         } catch (error) {
             toast.error("Failed to view recipe. Please try again.");
@@ -85,52 +89,65 @@ function Recipe({ user }) {
     }
   
     return (recipeInfo &&
-        <>
-              <div className="recipe-card">
-                { user && recipeInfo.authorId === user.uid && (
-                  <div className='recipe-management'>
-                    <p className='recipe-action' onClick={editRecipe}>✎ Edit</p>
-                    <p className='recipe-action' onClick={deleteRecipe}>✖ Delete</p>
-                  </div>
-                )}
-                {/* <div className="recipe-actions">
-                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
-                    Bookmark
-                  </button>
-                </div> */}
-                <h2 className="recipe-title">{recipeInfo.name}</h2>
-                <p className="recipe-description">Author: {recipeInfo.authorId} Date: {recipeInfo.lastUpdated} Views: {recipeInfo.views}</p>
-                <p className="recipe-description">Cooking Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
-                <p className="recipe-description">Servings: {recipeInfo.servings}</p>
-                
-                <h3 className = "recipe-description">Ingredients: </h3>
-                <ol className="ingredient-list">
-                  {Array.isArray(recipeInfo.ingredients) ? (
-                    recipeInfo.ingredients.map((ing, i) => (
-                    <li key={i} className="ingredient-item">
-                      {ing.quantity} {ing.quantityUnit} {ing.name}
-                    </li>
-                  ))
-                  ) : (
-                    <li>No ingredients available</li>
-                )}
-                </ol>
+      <>
+          <div className="recipe-card">
+          { user && recipeInfo.authorId === user.uid && (
+            <div className='recipe-management'>
+            <p className='recipe-action' onClick={editRecipe}>✎ Edit</p>
+            <p className='recipe-action' onClick={deleteRecipe}>✖ Delete</p>
+            </div>
+          )}
+          <h2 className="page-title">{recipeInfo.name}</h2>
+          <div className="recipe-metadata">
+            <p className="author-name">{recipeInfo.authorName}</p>
+            <p className="date">{recipeInfo.lastUpdated}</p>
+          </div>
+          <p className="recipe-description">{recipeInfo.views} views</p>
+          <div className="recipe-details">
+            <p className="recipe-description">Total Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
+            <p className="recipe-description">Servings: {recipeInfo.servings}</p>
+          </div>
+          {/* Replace with proper image viewer */}
+          <img className="recipe-image" src={recipeInfo.images && recipeInfo.images[0] ? recipeInfo.images[0] : null} width="500" />
+          
+          <h3 className = "recipe-description">Ingredients: </h3>
+          <ol className="ingredient-list">
+            {Array.isArray(recipeInfo.ingredients) ? (
+            recipeInfo.ingredients.map((ing, i) => (
+            <li key={i} className="ingredient-item">
+              {ing.quantity} {ing.quantityUnit} {ing.name}
+            </li>
+            ))
+            ) : (
+            <li>No ingredients available</li>
+          )}
+          </ol>
 
-                <h3 className="recipe-description">Instructions: </h3>
-                <ol>
-                  {Array.isArray(recipeInfo.directions) ? (
-                    recipeInfo.directions.map((step, i) => (
-                      <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
-                      </li>
-                    ))
-                  ) : (
-                    <li>No instructions available</li>
-                  )}
-                </ol>
-                <p className='recipe-action' onClick={reportRecipe}>Report</p>
-              </div>
-        </>
+          <h3 className="recipe-description">Instructions: </h3>
+          <ol>
+            {Array.isArray(recipeInfo.directions) ? (
+            recipeInfo.directions.map((step, i) => (
+              <li key={i} className="ingredient-item">
+              {typeof step === 'object' ? step.step : step}
+              </li>
+            ))
+            ) : (
+            <li>No instructions available</li>
+            )}
+          </ol>
+          <h3 className="recipe-description">Notes: </h3>
+          <p className="recipe-description">{ recipeInfo.notes }</p>
+          <div className="tag-container">
+            <p>Tags</p>
+            <div className="tags">
+              {recipeInfo.tags.map(tag => (
+                <span key={tag} className="tag">{tag}</span>
+              ))}
+            </div>
+          </div>
+          <p className='recipe-action report-button' onClick={reportRecipe}>Report</p>
+        </div>
+      </>
     )
 }
 

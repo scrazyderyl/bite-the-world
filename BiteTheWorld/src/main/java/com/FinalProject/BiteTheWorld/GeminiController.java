@@ -33,10 +33,10 @@ public class GeminiController {
     }
 
     @PostMapping("/recommendations")
-public ResponseEntity<List<Recipe>> getRecommendations(@RequestBody IdToken idToken) {
+public ResponseEntity<List<RecipeOverview>> getRecommendations(@RequestBody IdToken idToken) {
     try {
         String userId = accountSystem.getUID(idToken.idToken);
-        List<Recipe> recommendations = contentSystem.recommendFromHistory(userId);
+        List<RecipeOverview> recommendations = contentSystem.recommendFromHistory(userId);
 
         // LOGGING for debug
         System.out.println("Sending recommendations: " + recommendations.size());

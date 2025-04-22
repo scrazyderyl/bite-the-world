@@ -7,11 +7,16 @@ function RecipeCard({ recipe }) {
     <Link to={`/recipes/${recipe.id}`} className="card-link">
       <div className="recipe-card">
         <div className="card-image-container">
-          <img 
-            src={recipe.thumbnail || '/placeholder-food.jpg'} 
-            alt={recipe.name}
-            className="card-image"
-          />
+          {recipe.thumbnail ? (
+            <img 
+              src={recipe.thumbnail} 
+              alt={recipe.name}
+              className="card-image"
+            />
+            ): (
+              <p>No image</p>
+            )
+          }
           {recipe.rating > 0 && (
             <div className="rating-badge">
               <span className="rating-value">{recipe.rating.toFixed(1)}</span>

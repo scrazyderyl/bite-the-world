@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteResult;
-import com.google.gson.Gson;
 
 import me.xdrop.fuzzywuzzy.FuzzySearch;
 import me.xdrop.fuzzywuzzy.model.BoundExtractedResult;
@@ -208,12 +206,11 @@ class ContentSystem {
         return featuredRecipe;
     }
 
-    public List<Recipe> recommendFromHistory(String userId) {
+    public List<RecipeOverview> recommendFromHistory(String userId) {
         try {
             // Fetch all recipes from Firestore
 
-            Account account =
-            db.collection("accounts").document(userId).get().get().toObject(Account.class);
+            Account account = db.collection("accounts").document(userId).get().get().toObject(Account.class);
             History history = account.history;
 
             if (history == null || history.postViews == null || history.postViews.isEmpty()) {
@@ -228,13 +225,31 @@ class ContentSystem {
             String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
             System.out.println("Recommendations JSON: " + json);
             
-            List<Recipe> recommendations = GeminiIntegration.parseRecommendations(json);
-            if (recommendations == null) {
+            List<String> recommendedIds = GeminiIntegration.parseRecommendations(json);
+
+            if (recommendedIds == null) {
                 System.err.println("Failed to parse recommendations.");
                 return List.of();
             }
+
+            // Get recipe for each recommended IDs
+            List<RecipeOverview> recommendedRecipes = new ArrayList<>(recommendedIds.size());
+
+            for (String id : recommendedIds) {
+                DocumentSnapshot recipeDocument = doc.document(id).get().get();
+
+                if (recipeDocument.exists()) {
+                    Recipe recipe = recipeDocument.toObject(Recipe.class);
+
+                    if (recipe != null) {
+                        recommendedRecipes.add(recipe.toListing());
+                    }
+                } else {
+                    System.err.println("Recipe not found: " + id);
+                }
+            }
             
-            return recommendations;
+            return recommendedRecipes;
             
         } catch (Exception e) {
             System.out.println("Error in recommendFromHistory: " + e.getMessage());
