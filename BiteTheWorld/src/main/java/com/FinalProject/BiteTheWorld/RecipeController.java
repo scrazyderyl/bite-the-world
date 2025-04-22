@@ -77,6 +77,12 @@ public class RecipeController {
                 return ResponseEntity.internalServerError().build();
             }
 
+            // Update country summary
+            for (Country country : recipe.countries) {
+                String countryCode = country.name();
+                contentSystem.updateCountrySummary(countryCode);
+            }
+
             return ResponseEntity.ok(id);
         } catch (FirebaseAuthException e) {
             return ResponseEntity.status(401).body("Failed to authenticate user");

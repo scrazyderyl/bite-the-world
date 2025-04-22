@@ -128,7 +128,7 @@ public class GeminiIntegration {
         {
           "systemInstruction": {
             "parts": [
-              {"text" : "You are an experienced food guide. Give a summary of the country's cuisine based on the recipes listed. Treat each entry as a separate recipe. Only output the summary."}
+              {"text" : "You are an experienced food guide. Give a summary of the country's cuisine based on the recipes listed. Treat each entry as a separate recipe. Only output the summary. Work off what you are given, and don't mention anything about the number of recipes. If there are no recipes, output 'No recipes had been added yet.'"}
             ]
           },
           "contents": [{
@@ -137,13 +137,30 @@ public class GeminiIntegration {
             ]
           }],
           "generationConfig": {
-            "response_mime_type": "plain/text"
+            "response_mime_type": "text/plain"
           }
         }
         """,
         partsBuilder.toString());
   
-    return generate(body);
+        String response = generate(body);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // 1. Parse outer response
+            JsonNode root = objectMapper.readTree(response);
+        
+            // 2. Navigate to text string inside the first candidate
+            return root.path("candidates")
+              .path(0)
+              .path("content")
+              .path("parts")
+              .path(0)
+              .path("text")
+              .asText();
+        } catch (Exception e) {
+          return null;
+        }
   }
   
   public static List<String> parseRecommendations(String json) {
