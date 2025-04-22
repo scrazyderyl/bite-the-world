@@ -18,7 +18,7 @@ function Recipe({ user }) {
 
     const fetchRecipe = async () => {
         try {
-            const idToken = await auth.currentUser.getIdToken();
+            const idToken = auth.currentUser ? await auth.currentUser.getIdToken() : null;
             const body = {
                 idToken: idToken,
             };
