@@ -25,7 +25,7 @@ const UserHomePage = ({ user }) => {
 
   useEffect(() => {
     // published recipes
-    fetch("/recipes.json")
+    fetch(`http://localhost:8080/recipes/user/${user.uid}`)
       .then(res => res.json())
       .then(data => setRecipes(data));
 
@@ -188,36 +188,12 @@ const UserHomePage = ({ user }) => {
         <div className="recipes-container">
           {recipes.length > 0 ? (
             recipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card">
-                <div className="recipe-actions">
-                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
-                    Bookmark
-                  </button>
-                </div>
-                <h2 className="recipe-title">{recipe.name}</h2>
-                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
-                <p className="recipe-description">Servings: {recipe.servings}</p>
-                <h3 className="recipe-description">Ingredients: </h3>
-                <ul className="ingredient-list">
-                  {recipe.ingredients.map((ing, i) => (
-                    <li key={i} className="ingredient-item">
-                      {ing.quantity} {ing.unit} {ing.ingredient || ing.name}
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="recipe-description">Instructions: </h3>
-                <ol>
-                  {Array.isArray(recipe.steps) ? (
-                    recipe.steps.map((step, i) => (
-                      <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
-                      </li>
-                    ))
-                  ) : (
-                    <li>No instructions available</li>
-                  )}
-                </ol>
-              </div>
+              <>
+                <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)} style={{ marginBottom: "10px" }}>
+                  Bookmark
+                </button>
+                <RecipeCard recipe={recipe} key={recipe.id} />
+              </>
             ))
           ) : (
             <p className="no-recipes">No recipes yet. Create your first recipe!</p>

@@ -1,5 +1,7 @@
 package com.FinalProject.BiteTheWorld;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -103,6 +105,22 @@ public class RecipeController {
             return ResponseEntity.notFound().build();
         }   
         return ResponseEntity.ok(featured);
+    }
+
+    @GetMapping("/user/{uid}")
+    public ResponseEntity<List<RecipeOverview>> getRecipesByUser(@PathVariable String uid) {
+        try {
+            List<RecipeOverview> recipes = contentSystem.getRecipesByUser(uid);
+
+            if (recipes.isEmpty()) {
+                return ResponseEntity.ok(List.of());
+            }
+
+            return ResponseEntity.ok(recipes);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
     }
     
     @DeleteMapping("/{id}")
