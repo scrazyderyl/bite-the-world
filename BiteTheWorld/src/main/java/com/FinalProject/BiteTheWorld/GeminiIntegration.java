@@ -91,7 +91,7 @@ public class GeminiIntegration {
 
     GeminiRequest request = new GeminiRequest(
         new SystemInstruction(List.of(new TextPart(
-            "You are a smart food recommender system. Based on the first list of recipes that the user has viewed, recommend three recipes from the second list. Focus on matching cuisines, ingredients, or tags. Output only a JSON array of the recommended Recipe objects (with name, description, ingredients, and optionally countries, images, and tags). Do not include any extra explanation."
+            "You are a smart food recommender system. Based on the first list of recipes that the user has viewed, recommend three recipes from the second list. Focus on matching cuisines, ingredients, or tags. Output a JSON array of the IDs of the recommended recipes. Do not include any extra explanation."
         ))),
         List.of(new Content(List.of(
             new TextPart("Viewed Recipes:\n" + viewedJson),
@@ -146,7 +146,7 @@ public class GeminiIntegration {
     return generate(body);
   }
   
-  public static List<Recipe> parseRecommendations(String json) {
+  public static List<String> parseRecommendations(String json) {
   ObjectMapper objectMapper = new ObjectMapper();
   try {
     // 1. Parse outer response
@@ -161,10 +161,10 @@ public class GeminiIntegration {
                       .path("text")
                       .asText();
 
-    // 3. Now parse that inner JSON string as a list of recipes
+    // 3. Parse the text string as a strings
     return objectMapper.readValue(
-        text,
-        objectMapper.getTypeFactory().constructCollectionType(List.class, Recipe.class)
+      text,
+      objectMapper.getTypeFactory().constructCollectionType(List.class, String.class)
     );
   } catch (IOException e) {
     System.out.println("Error parsing recommendations: " + e.getMessage());

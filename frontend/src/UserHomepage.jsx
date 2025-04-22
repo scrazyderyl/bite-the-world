@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "../Styles/Recipes.css";
 import { RecipeForm, getDefaultValues } from './RecipeForm';
 import { auth } from "./firebaseConfig";
+import RecipeCard from './RecipeCard';
 
 const UserHomePage = ({ user }) => {
   const navigate = useNavigate();
@@ -301,36 +302,7 @@ const UserHomePage = ({ user }) => {
           <h2>Recommended Recipes</h2>
           {recommendedRecipes.length > 0 ? (
             recommendedRecipes.map(recipe => (
-              <div key={recipe.id} className="recipe-card">
-                <div className="recipe-actions">
-                  <button className="bookmark-btn" onClick={() => handleBookmarkRecipe(recipe)}>
-                    Bookmark
-                  </button>
-                </div>
-                <h2 className="recipe-title">{recipe.name}</h2>
-                <p className="recipe-description">Cooking Time: {recipe.cookingTime || recipe.totalTime}</p>
-                <p className="recipe-description">Servings: {recipe.servings}</p>
-                <h3 className="recipe-description">Ingredients: </h3>
-                <ul className="ingredient-list">
-                  {recipe.ingredients.map((ing, i) => (
-                    <li key={i} className="ingredient-item">
-                      {ing.quantity} {ing.unit} {ing.ingredient || ing.name}
-                    </li>
-                  ))}
-                </ul>
-                <h3 className="recipe-description">Instructions: </h3>
-                <ol>
-                  {Array.isArray(recipe.steps) ? (
-                    recipe.steps.map((step, i) => (
-                      <li key={i} className="ingredient-item">
-                        {typeof step === 'object' ? step.step : step}
-                      </li>
-                    ))
-                  ) : (
-                    <li>No instructions available</li>
-                  )}
-                </ol>
-              </div>
+              <RecipeCard recipe={recipe} key={recipe.id} />
             ))
           ) : (
             <p>No recommendations yet. Click the tab again to try fetching them.</p>

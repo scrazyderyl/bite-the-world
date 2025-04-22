@@ -206,7 +206,7 @@ class ContentSystem {
         return featuredRecipe;
     }
 
-    public List<Recipe> recommendFromHistory(String userId) {
+    public List<RecipeOverview> recommendFromHistory(String userId) {
         try {
             // Fetch all recipes from Firestore
 
@@ -225,13 +225,31 @@ class ContentSystem {
             String json = GeminiIntegration.generateRecommendations(allRecipes, history.postViews);
             System.out.println("Recommendations JSON: " + json);
             
-            List<Recipe> recommendations = GeminiIntegration.parseRecommendations(json);
-            if (recommendations == null) {
+            List<String> recommendedIds = GeminiIntegration.parseRecommendations(json);
+
+            if (recommendedIds == null) {
                 System.err.println("Failed to parse recommendations.");
                 return List.of();
             }
+
+            // Get recipe for each recommended IDs
+            List<RecipeOverview> recommendedRecipes = new ArrayList<>(recommendedIds.size());
+
+            for (String id : recommendedIds) {
+                DocumentSnapshot recipeDocument = doc.document(id).get().get();
+
+                if (recipeDocument.exists()) {
+                    Recipe recipe = recipeDocument.toObject(Recipe.class);
+
+                    if (recipe != null) {
+                        recommendedRecipes.add(recipe.toListing());
+                    }
+                } else {
+                    System.err.println("Recipe not found: " + id);
+                }
+            }
             
-            return recommendations;
+            return recommendedRecipes;
             
         } catch (Exception e) {
             System.out.println("Error in recommendFromHistory: " + e.getMessage());
