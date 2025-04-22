@@ -104,10 +104,11 @@ function Recipe({ user }) {
           </div>
           <p className="recipe-description">{recipeInfo.views} views</p>
           <div className="recipe-details">
-            <p className="recipe-description">Cooking Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
+            <p className="recipe-description">Total Time: {recipeInfo.cookTime + recipeInfo.prepTime}</p>
             <p className="recipe-description">Servings: {recipeInfo.servings}</p>
           </div>
-          <img className="recipe-image" src={recipeInfo.images && recipeInfo.images[0] ? recipeInfo.images[0] : null} width="800" />
+          {/* Replace with proper image viewer */}
+          <img className="recipe-image" src={recipeInfo.images && recipeInfo.images[0] ? recipeInfo.images[0] : null} width="500" />
           
           <h3 className = "recipe-description">Ingredients: </h3>
           <ol className="ingredient-list">
@@ -136,8 +137,16 @@ function Recipe({ user }) {
           </ol>
           <h3 className="recipe-description">Notes: </h3>
           <p className="recipe-description">{ recipeInfo.notes }</p>
-          <p className='recipe-action' onClick={reportRecipe}>Report</p>
+          <div className="tag-container">
+            <p>Tags</p>
+            <div className="tags">
+              {recipeInfo.tags.map(tag => (
+                <span key={tag} className="tag">{tag}</span>
+              ))}
+            </div>
           </div>
+          <p className='recipe-action report-button' onClick={reportRecipe}>Report</p>
+        </div>
       </>
     )
 }

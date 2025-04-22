@@ -76,3 +76,21 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
+
+.tag-container {
+  display: flex;
+}
+
+.tags {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.tag {
+  color: white;
+}
+
+.report-button {
+  margin-top: 20px;
+}
