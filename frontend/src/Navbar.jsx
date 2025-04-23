@@ -14,7 +14,7 @@ function Navbar({ user, handleLogout }) {
             <Link to='/'>
                 <button className="link underline-hover">Map</button>
             </Link>
-            <Link to='/ingredients'>
+            <Link to='/search'>
                 <button className="link underline-hover">Search</button>
             </Link>
         </div>

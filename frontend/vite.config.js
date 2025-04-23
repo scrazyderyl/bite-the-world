@@ -9,4 +9,7 @@ export default defineConfig({
   optimizeDeps: {
     include: ['idb'],
   },
+  server: {
+    historyApiFallback: true,
+  },
 })
