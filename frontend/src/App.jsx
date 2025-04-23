@@ -10,6 +10,7 @@ import Country from './Country'
 import Map from './Map'
 import IngredientLookup from './IngredientLookup';
 import Recipe from './Recipe';
+import Ingredient from './Ingredient';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
@@ -96,6 +97,11 @@ function App() {
             }
             />
           </Route>
+          <Route path="/ingredients/:ingredient_id" element={
+            <div style={styles.pagePadding}>
+              <Ingredient/>
+            </div>
+          } />
         </Routes>
       </div>
     </>

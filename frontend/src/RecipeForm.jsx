@@ -1,4 +1,5 @@
 import { React, useId, useState } from "react";
+import { Link } from "react-router-dom";
 import { components } from 'react-select';
 import Async from 'react-select/async';
 import { auth } from "./firebaseConfig";
@@ -410,7 +411,9 @@ function RecipeForm({ values, onSuccess }) {
                       {values.ingredients.length > 0 &&
                         values.ingredients.map((ingredient, index) => (
                           <div key={index} className="list-item-container">
-                            <p className="list-item-label">{ ingredient.name }</p>
+                            <Link to={`/ingredients/${ingredient.id}`}>
+                              <p className="list-item-label list-link">{ ingredient.name }</p>
+                            </Link>
                             <div className="fields-grid" style={{ gridTemplateColumns: "90px 190px min-content" }}>
                               <Field
                                 className="form-input"
