@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.cloud.firestore.Firestore;
 import com.google.firebase.auth.FirebaseAuthException;
 
 import jakarta.validation.Valid;
@@ -19,12 +18,12 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/ingredients")
 public class IngredientController {
-    private final Firestore db;
     private final ContentSystem contentSystem;
+    private final AccountSystem accountSystem;
 
     public IngredientController() {
-        db = FirebaseConnection.getDatabase();
         this.contentSystem = ContentSystem.getInstance();
+        this.accountSystem = AccountSystem.getInstance();
     }
 
     @PostMapping("/{id}")
@@ -35,6 +34,8 @@ public class IngredientController {
             if (ingredient == null) {
                 return ResponseEntity.notFound().build();
             }
+
+            ingredient.authorName = accountSystem.getUserById(ingredient.authorID).getDisplayName();
 
             return ResponseEntity.ok(ingredient);
         }  catch (Exception e) {

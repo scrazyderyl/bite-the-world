@@ -38,11 +38,7 @@ public class RecipeController {
                 return ResponseEntity.notFound().build();
             }
 
-            try {
-                recipe.authorName = accountSystem.getUserById(recipe.authorId).getDisplayName();
-            } catch (FirebaseAuthException e) {
-                
-            }
+            recipe.authorName = accountSystem.getUserById(recipe.authorId).getDisplayName();
             
             ObjectMapper mapper = new ObjectMapper();
             ObjectWriter writer;

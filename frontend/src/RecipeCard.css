@@ -41,6 +41,8 @@
     font-size: 20px;
     background-color: lightgray;
     overflow: hidden;
+    margin-top: 20px;
+    margin-bottom: 20px;
   }
   
   .card-image {

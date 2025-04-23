@@ -1,11 +1,13 @@
 package com.FinalProject.BiteTheWorld;
 
 import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.firestore.annotation.Exclude;
 
 class Ingredient {
     @DocumentId private String id;
     public String name;
     public String authorID;
+    @Exclude public String authorName;
     public String image;
     public String description;
 

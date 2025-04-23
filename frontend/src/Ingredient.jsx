@@ -52,7 +52,9 @@ function Ingredient() {
               <div className="recipe-card"> 
                 {/* Using same class as recipe for now or until this is needed*/}
                 <h2 className="recipe-title">{IngredientInfo.name}</h2>
-                <p className="recipe-description">Author: {IngredientInfo.authorId}</p>
+                <div className="recipe-metadata">
+                    <p className="author-name">{IngredientInfo.authorName}</p>
+                </div>
                 <div className="card-image-container">
                     {IngredientInfo.image ? (
                         <img 
@@ -65,7 +67,7 @@ function Ingredient() {
                         )
                     }
                 </div>
-                <p className="recipe-description">Details: {IngredientInfo.description}</p>
+                <p className="recipe-description summary">{IngredientInfo.description}</p>
               </div>
         </>
     )
