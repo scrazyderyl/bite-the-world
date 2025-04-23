@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 function Ingredient() {
     const [IngredientInfo, setIngedientInfo] = useState(null);
     const [loading, setLoading] = useState(true); // Add loading state
-    const { Ingredient_id } = useParams();
+    const { ingredient_id } = useParams();
 
     const fetchIngredient = async () => {
         try {
@@ -16,8 +16,8 @@ function Ingredient() {
             const body = {
                 idToken: idToken,
             };
-            console.log("Fetching Ingredient with ID:", Ingredient_id);
-            const response = await fetch(`http://localhost:8080/ingredients/${Ingredient_id}`, {
+            
+            const response = await fetch(`http://localhost:8080/ingredients/${ingredient_id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,7 +41,7 @@ function Ingredient() {
     
     useEffect(() => {
         fetchIngredient();
-    }, [Ingredient_id]); // Run fetchIngredient only when Ingredient_id 
+    }, [ingredient_id]); // Run fetchIngredient only when ingredient_id 
 
     if (loading) {
         return <div>Loading...</div>; // Show loading message
@@ -52,12 +52,22 @@ function Ingredient() {
               <div className="recipe-card"> 
                 {/* Using same class as recipe for now or until this is needed*/}
                 <h2 className="recipe-title">{IngredientInfo.name}</h2>
-                <p className="recipe-description">Author: {IngredientInfo.authorId}</p>
-                <img src={IngredientInfo.image} alt={IngredientInfo.name}></img>
-                <p className="recipe-description">Details: {IngredientInfo.description}</p>
-                
-
-
+                <div className="recipe-metadata">
+                    <p className="author-name">{IngredientInfo.authorName}</p>
+                </div>
+                <div className="card-image-container">
+                    {IngredientInfo.image ? (
+                        <img 
+                        src={IngredientInfo.image} 
+                        alt={IngredientInfo.name}
+                        className="card-image"
+                        />
+                        ): (
+                        <p>No image</p>
+                        )
+                    }
+                </div>
+                <p className="recipe-description summary">{IngredientInfo.description}</p>
               </div>
         </>
     )

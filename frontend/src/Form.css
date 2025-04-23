@@ -166,8 +166,18 @@
 }
 
 .list-item-label {
+  font-size: 18px;
   font-weight: 600;
   color: #444;
   margin-bottom: 8px;
   display: block;
+}
+
+.list-link {
+  display: inline-block;
+  color: #3b59aa !important;
+}
+
+.list-link:hover {
+  color: #223770 !important;
 }

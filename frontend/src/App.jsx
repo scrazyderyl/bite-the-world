@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate } from 'react-router'
 import { auth } from "./firebaseConfig";
 
 import Navbar from './Navbar';
+import NotFound from './NotFound';
 import Login from './Login';
 import Signup from './Signup';
 import UserHomepage from './UserHomepage';
@@ -10,6 +11,7 @@ import Country from './Country'
 import Map from './Map'
 import IngredientLookup from './IngredientLookup';
 import Recipe from './Recipe';
+import Ingredient from './Ingredient';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 import './App.css';
@@ -51,7 +53,12 @@ function App() {
       <div style={styles.page}>
         <Routes>
           <Route path="/" element={<Map />} />
-          <Route path="/ingredients" element={
+          <Route path="*" element={
+            <div style={styles.pagePadding}>
+              <NotFound />
+            </div>
+          } />
+          <Route path="/search" element={
             <div style={styles.pagePadding}>
               <IngredientLookup/>
             </div>
@@ -96,6 +103,11 @@ function App() {
             }
             />
           </Route>
+          <Route path="/ingredients/:ingredient_id" element={
+            <div style={styles.pagePadding}>
+              <Ingredient/>
+            </div>
+          } />
         </Routes>
       </div>
     </>
