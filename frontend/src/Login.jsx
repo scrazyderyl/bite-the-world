@@ -1,23 +1,38 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./firebaseConfig"; // Import Firebase authentication
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "./firebaseConfig";
 
 function Login({ onLogin }) {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       onLogin();
       navigate("/");
     } catch (error) {
       setError(error.message);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError("Please enter your email address first.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMessage("Password reset email sent! Check your inbox.");
+      setError("");
+    } catch (error) {
+      setError(error.message);
+      setMessage("");
     }
   };
 
@@ -26,6 +41,7 @@ function Login({ onLogin }) {
       <div style={styles.container}>
         <h2 style={styles.title}>Login</h2>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        {message && <p style={{ color: "green" }}>{message}</p>}
         <form onSubmit={handleSubmit} style={styles.form}>
           <input
             type="email"
@@ -43,17 +59,24 @@ function Login({ onLogin }) {
             style={styles.input}
             required
           />
-          <button type="submit" style={styles.button}>Login</button>
+          <button type="submit" style={{ ...styles.button, backgroundColor: "#333" }}>
+            Login
+          </button>
         </form>
+        <div style={styles.buttonContainer}>
+          <Link to="/register" style={{ textDecoration: "none" }}>
+            <button style={{ ...styles.button, backgroundColor: "#333" }}>
+              Create an Account
+            </button>
+          </Link>
+          <button onClick={handlePasswordReset} style={{ ...styles.button, backgroundColor: "#333" }}>
+            Forgot Password?
+          </button>
+        </div>
       </div>
-      <Link to="/register">
-        <button style={styles.toggleButton}>
-          Create an Account
-        </button>
-      </Link>
     </>
   );
-};
+}
 
 const styles = {
   container: {
@@ -69,21 +92,28 @@ const styles = {
     flexDirection: "column",
   },
   title: {
-    color: "#333"
+    color: "#333",
+    textAlign: "center",
   },
   input: {
     marginBottom: "10px",
     padding: "10px",
     fontSize: "16px",
   },
-  button: {
+  button: { // ✅ Unified button style
+    width: "100%",
     padding: "10px",
     fontSize: "16px",
-    backgroundColor: "#333",
     color: "#fff",
     border: "none",
     borderRadius: "5px",
     cursor: "pointer",
+  },
+  buttonContainer: { 
+    marginTop: "20px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
   },
 };
 
