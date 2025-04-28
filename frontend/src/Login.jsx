@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { signInWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
+import { signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 
 function Login({ onLogin }) {
@@ -36,6 +36,17 @@ function Login({ onLogin }) {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      onLogin();
+      navigate("/");
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   return (
     <>
       <div style={styles.container}>
@@ -64,6 +75,9 @@ function Login({ onLogin }) {
           </button>
         </form>
         <div style={styles.buttonContainer}>
+          <button onClick={handleGoogleLogin} style={{ ...styles.button, backgroundColor: "#db4437" }}>
+            Login with Google
+          </button>
           <Link to="/register" style={{ textDecoration: "none" }}>
             <button style={{ ...styles.button, backgroundColor: "#333" }}>
               Create an Account
@@ -100,7 +114,7 @@ const styles = {
     padding: "10px",
     fontSize: "16px",
   },
-  button: { // ✅ Unified button style
+  button: {
     width: "100%",
     padding: "10px",
     fontSize: "16px",
@@ -109,7 +123,7 @@ const styles = {
     borderRadius: "5px",
     cursor: "pointer",
   },
-  buttonContainer: { 
+  buttonContainer: {
     marginTop: "20px",
     display: "flex",
     flexDirection: "column",
